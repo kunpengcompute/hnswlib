@@ -73,7 +73,7 @@ def cpp_flag(compiler):
 
 class BuildExt(build_ext):
     """A custom build extension for adding compiler-specific options."""
-    compiler_flag_native = '-march=native'
+    compiler_flag_native = '-march=armv8.2+sve'
     c_opts = {
         'msvc': ['/EHsc', '/openmp', '/O2'],
         'unix': ['-O3', compiler_flag_native],  # , '-w'

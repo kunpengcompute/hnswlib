@@ -1,6 +1,8 @@
 #pragma once
 #include "hnswlib.h"
 
+#if defined(HNSWLIB_USE_X86)
+
 namespace hnswlib {
 
 static float
@@ -398,3 +400,5 @@ class InnerProductSpace : public SpaceInterface<float> {
 };
 
 }  // namespace hnswlib
+
+#endif // HNSWLIB_USE_X86

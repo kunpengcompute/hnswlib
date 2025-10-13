@@ -1,6 +1,8 @@
 #pragma once
 #include "hnswlib.h"
 
+#if defined(HNSWLIB_USE_X86)
+
 namespace hnswlib {
 
 static float
@@ -322,3 +324,5 @@ class L2SpaceI : public SpaceInterface<int> {
     ~L2SpaceI() {}
 };
 }  // namespace hnswlib
+
+#endif // HNSWLIB_USE_X86

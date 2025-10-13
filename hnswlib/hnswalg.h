@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(HNSWLIB_USE_X86)
+
 #include "visited_list_pool.h"
 #include "hnswlib.h"
 #include <atomic>
@@ -908,7 +910,6 @@ class HierarchicalNSW : public AlgorithmInterface<dist_t> {
     }
 
 
-
     /*
     * Remove the deleted mark of the node.
     */
@@ -1410,3 +1411,5 @@ class HierarchicalNSW : public AlgorithmInterface<dist_t> {
     }
 };
 }  // namespace hnswlib
+
+#endif // HNSWLIB_USE_X86
