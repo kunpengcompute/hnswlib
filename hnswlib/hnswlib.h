@@ -1,9 +1,9 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2024-2024. All rights reserved.
+  Adapted from https://github.com/nmslib/hnswlib/blob/master/hnswlib/hnswlib.h
  */
+
 #pragma once
 
-// ================== 平台自动检测与宏定义 ==================
 #if defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86)
     #define HNSWLIB_USE_X86
 #elif defined(__aarch64__) || defined(__arm__)
@@ -12,7 +12,6 @@
     #endif
 #endif
 
-// ================== FP16类型定义（仅ARM需要） ==================
 #if defined(HNSWLIB_USE_ARM)
     #if !defined(__ARM_FEATURE_FP16_SCALAR_ARITHMETIC) && !defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC)
         typedef __fp16 float16_t;
@@ -23,7 +22,6 @@
     #endif
 #endif
 
-// ================== 标准库与基础类型 ==================
 #include <queue>
 #include <vector>
 #include <iostream>
@@ -40,10 +38,8 @@
 #include <algorithm>
 
 namespace hnswlib {
-// 通用标签类型
 typedef size_t labeltype;
 
-// ========== 通用接口定义 ========== //
 class BaseFilterFunctor {
  public:
     virtual bool operator()(hnswlib::labeltype id) { return true; }
@@ -83,22 +79,15 @@ static void readBinaryPOD(std::istream &in, T &podRef) {
 // template<typename MTYPE>
 using DISTFUNC = float(*)(const void *, const void *, const void *);
 
-// 空间接口
-// 具体空间实现（如L2、IP）需继承并实现
-// 支持float32/float16（ARM）
 template<typename MTYPE>
 class SpaceInterface {
  public:
     virtual size_t get_data_size() = 0;
-    // virtual DISTFUNC<MTYPE> get_dist_func() = 0;
     virtual DISTFUNC get_dist_func() = 0;
     virtual void *get_dist_func_param() = 0;
     virtual ~SpaceInterface() {}
 };
 
-// 算法接口
-// 具体算法（如HNSW、Bruteforce）需继承并实现
-// 支持float32/float16（ARM）
 template<typename dist_t>
 class AlgorithmInterface {
  public:
@@ -117,11 +106,13 @@ AlgorithmInterface<dist_t>::searchKnnCloserFirst(const void* query_data, size_t 
                                                  BaseFilterFunctor* isIdAllowed) const {
     std::vector<std::pair<dist_t, labeltype>> result;
     auto ret = searchKnn(query_data, k, isIdAllowed);
+    {
     size_t sz = ret.size();
     result.resize(sz);
     while (!ret.empty()) {
         result[--sz] = ret.top();
         ret.pop();
+        }
     }
     return result;
 }

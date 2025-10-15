@@ -11,7 +11,7 @@ class BruteforceSearch : public AlgorithmInterface<dist_t> {
  public:
     char *data_;
     size_t maxelements_;
-    size_t cur_element_count;
+    size_t cur_element_count_;
     size_t size_per_element_;
 
     size_t data_size_;
@@ -25,7 +25,7 @@ class BruteforceSearch : public AlgorithmInterface<dist_t> {
     BruteforceSearch(SpaceInterface <dist_t> *s)
         : data_(nullptr),
             maxelements_(0),
-            cur_element_count(0),
+            cur_element_count_(0),
             size_per_element_(0),
             data_size_(0),
             dist_func_param_(nullptr) {
@@ -35,7 +35,7 @@ class BruteforceSearch : public AlgorithmInterface<dist_t> {
     BruteforceSearch(SpaceInterface<dist_t> *s, const std::string &location)
         : data_(nullptr),
             maxelements_(0),
-            cur_element_count(0),
+            cur_element_count_(0),
             size_per_element_(0),
             data_size_(0),
             dist_func_param_(nullptr) {
@@ -52,7 +52,7 @@ class BruteforceSearch : public AlgorithmInterface<dist_t> {
         data_ = (char *) malloc(maxElements * size_per_element_);
         if (data_ == nullptr)
             throw std::runtime_error("Not enough memory: BruteforceSearch failed to allocate data");
-        cur_element_count = 0;
+        cur_element_count_ = 0;
     }
 
 
@@ -70,12 +70,12 @@ class BruteforceSearch : public AlgorithmInterface<dist_t> {
             if (search != dict_external_to_internal.end()) {
                 idx = search->second;
             } else {
-                if (cur_element_count >= maxelements_) {
+                if (cur_element_count_ >= maxelements_) {
                     throw std::runtime_error("The number of elements exceeds the specified limit\n");
                 }
-                idx = cur_element_count;
+                idx = cur_element_count_;
                 dict_external_to_internal[label] = idx;
-                cur_element_count++;
+                cur_element_count_++;
             }
         }
         memcpy(data_ + size_per_element_ * idx + data_size_, &label, sizeof(labeltype));
@@ -94,20 +94,20 @@ class BruteforceSearch : public AlgorithmInterface<dist_t> {
         dict_external_to_internal.erase(found);
 
         size_t cur_c = found->second;
-        labeltype label = *((labeltype*)(data_ + size_per_element_ * (cur_element_count-1) + data_size_));
+        labeltype label = *((labeltype*)(data_ + size_per_element_ * (cur_element_count_-1) + data_size_));
         dict_external_to_internal[label] = cur_c;
         memcpy(data_ + size_per_element_ * cur_c,
-                data_ + size_per_element_ * (cur_element_count-1),
+                data_ + size_per_element_ * (cur_element_count_-1),
                 data_size_+sizeof(labeltype));
-        cur_element_count--;
+        cur_element_count_--;
     }
 
 
     std::priority_queue<std::pair<dist_t, labeltype >>
     searchKnn(const void *query_data, size_t k, BaseFilterFunctor* isIdAllowed = nullptr) const {
-        assert(k <= cur_element_count);
+        assert(k <= cur_element_count_);
         std::priority_queue<std::pair<dist_t, labeltype >> topResults;
-        if (cur_element_count == 0) return topResults;
+        if (cur_element_count_ == 0) return topResults;
         for (int i = 0; i < k; i++) {
             dist_t dist = fstdistfunc_(query_data, data_ + size_per_element_ * i, dist_func_param_);
             labeltype label = *((labeltype*) (data_ + size_per_element_ * i + data_size_));
@@ -116,7 +116,7 @@ class BruteforceSearch : public AlgorithmInterface<dist_t> {
             }
         }
         dist_t lastdist = topResults.empty() ? std::numeric_limits<dist_t>::max() : topResults.top().first;
-        for (int i = k; i < cur_element_count; i++) {
+        for (int i = k; i < cur_element_count_; i++) {
             dist_t dist = fstdistfunc_(query_data, data_ + size_per_element_ * i, dist_func_param_);
             if (dist <= lastdist) {
                 labeltype label = *((labeltype *) (data_ + size_per_element_ * i + data_size_));
@@ -141,7 +141,7 @@ class BruteforceSearch : public AlgorithmInterface<dist_t> {
 
         writeBinaryPOD(output, maxelements_);
         writeBinaryPOD(output, size_per_element_);
-        writeBinaryPOD(output, cur_element_count);
+        writeBinaryPOD(output, cur_element_count_);
 
         output.write(data_, maxelements_ * size_per_element_);
 
@@ -155,7 +155,7 @@ class BruteforceSearch : public AlgorithmInterface<dist_t> {
 
         readBinaryPOD(input, maxelements_);
         readBinaryPOD(input, size_per_element_);
-        readBinaryPOD(input, cur_element_count);
+        readBinaryPOD(input, cur_element_count_);
 
         data_size_ = s->get_data_size();
         fstdistfunc_ = s->get_dist_func();

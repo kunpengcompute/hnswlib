@@ -1,6 +1,19 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2024-2024. All rights reserved.
+   Copyright 2025 Huawei Technologies Co., Ltd.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
  */
+
 #pragma once
 
 #include <unordered_map>
@@ -27,7 +40,7 @@ class BruteforceSearch : public AlgorithmInterface<float> {
 public:
     char *data_;
     size_t maxelements_;
-    size_t cur_element_count;
+    size_t cur_element_count__;
     size_t size_per_element_;
 
     size_t data_size_;
@@ -40,7 +53,7 @@ public:
     BruteforceSearch(SpaceInterface<T> *s)
         : data_(nullptr),
             maxelements_(0),
-            cur_element_count(0),
+            cur_element_count_(0),
             size_per_element_(0),
             data_size_(0),
             dist_func_param_(nullptr) {
@@ -49,7 +62,7 @@ public:
     BruteforceSearch(SpaceInterface<T> *s, const std::string &location)
         : data_(nullptr),
             maxelements_(0),
-            cur_element_count(0),
+            cur_element_count_(0),
             size_per_element_(0),
             data_size_(0),
             dist_func_param_(nullptr) {
@@ -63,15 +76,16 @@ public:
         dist_func_param_ = s->get_dist_func_param();
         size_per_element_ = data_size_ + sizeof(labeltype);
         data_ = (char *) malloc(maxElements * size_per_element_);
-        if (data_ == nullptr)
+        if (data_ == nullptr) {
             throw std::runtime_error("Not enough memory: BruteforceSearch failed to allocate data");
-        cur_element_count = 0;
-        
+        }
+        cur_element_count_ = 0;    
 
     }
 
     ~BruteforceSearch() {
         free(data_);
+        data_ = nullptr;
     }
 
     void addPoint(const void *datapoint, labeltype label, bool replace_deleted = false) override {
@@ -83,18 +97,16 @@ public:
             if (search != dict_external_to_internal.end()) {
                 idx = search->second;
             } else {
-                if (cur_element_count >= maxelements_) {
+                if (cur_element_count_ >= maxelements_) {
                     throw std::runtime_error("The number of elements exceeds the specified limit\n");
                 }
-                idx = cur_element_count;
+                idx = cur_element_count_;
                 dict_external_to_internal[label] = idx;
-                cur_element_count++;
+                cur_element_count_++;
             }
         }
         memcpy(data_ + size_per_element_ * idx + data_size_, &label, sizeof(labeltype));
         memcpy(data_ + size_per_element_ * idx, datapoint, data_size_);
-        
-
     }
 
     void removePoint(labeltype cur_external) {
@@ -108,22 +120,21 @@ public:
         dict_external_to_internal.erase(found);
 
         size_t cur_c = found->second;
-        labeltype label = *((labeltype*)(data_ + size_per_element_ * (cur_element_count-1) + data_size_));
+        labeltype label = *((labeltype*)(data_ + size_per_element_ * (cur_element_count_-1) + data_size_));
         dict_external_to_internal[label] = cur_c;
         memcpy(data_ + size_per_element_ * cur_c,
-                data_ + size_per_element_ * (cur_element_count-1),
-                data_size_+sizeof(labeltype));
-        cur_element_count--;
+               data_ + size_per_element_ * (cur_element_count_-1),
+               data_size_+sizeof(labeltype));
+        cur_element_count_--;
     }
 
     std::priority_queue<std::pair<float, labeltype>>
     searchKnn(const void *query_data, size_t k, BaseFilterFunctor* isIdAllowed = nullptr) const override {
-        assert(k <= cur_element_count);
+        assert(k <= cur_element_count_);
         std::priority_queue<std::pair<float, labeltype>> topResults;
-        if (cur_element_count == 0) return topResults;
-        
-
-        
+        if (cur_element_count_ == 0) {
+            return topResults;  
+        }     
         for (int i = 0; i < k; i++) {
             float dist = fstdistfunc_(query_data, data_ + size_per_element_ * i, dist_func_param_);
             labeltype label = *((labeltype*) (data_ + size_per_element_ * i + data_size_));
@@ -132,7 +143,7 @@ public:
             }
         }
         float lastdist = topResults.empty() ? std::numeric_limits<float>::max() : topResults.top().first;
-        for (int i = k; i < cur_element_count; i++) {
+        for (int i = k; i < cur_element_count_; i++) {
             float dist = fstdistfunc_(query_data, data_ + size_per_element_ * i, dist_func_param_);
             if (dist <= lastdist) {
                 labeltype label = *((labeltype *) (data_ + size_per_element_ * i + data_size_));
@@ -168,7 +179,7 @@ public:
 
         writeBinaryPOD(output, maxelements_);
         writeBinaryPOD(output, size_per_element_);
-        writeBinaryPOD(output, cur_element_count);
+        writeBinaryPOD(output, cur_element_count_);
 
         output.write(data_, maxelements_ * size_per_element_);
 
@@ -181,7 +192,7 @@ public:
 
         readBinaryPOD(input, maxelements_);
         readBinaryPOD(input, size_per_element_);
-        readBinaryPOD(input, cur_element_count);
+        readBinaryPOD(input, cur_element_count_);
 
         data_size_ = s->get_data_size();
         fstdistfunc_ = s->get_dist_func();
@@ -212,7 +223,7 @@ public:
 
     // 获取当前元素数量
     size_t getCurrentElementCount() const {
-        return cur_element_count;
+        return cur_element_count_;
     }
 
     // 获取最大元素数量
