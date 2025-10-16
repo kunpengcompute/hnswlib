@@ -48,7 +48,7 @@ int main() {
         for (auto &thread : threads) {
             thread.join();
         }
-        if (alg_hnsw->cur_element_count > max_elements - num_labels) {
+        if (alg_hnsw->cur_element_count_ > max_elements - num_labels) {
             break;
         }
         start_label += num_labels;
