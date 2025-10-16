@@ -9,14 +9,13 @@ set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fopenmp")
 
 set(ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../")
 message(STATUS "ROOT = ${ROOT}")
-#set(SECURE_C_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../huawei_secure_c")
 
 include(FetchContent)
 FetchContent_Declare(
     googletest
-    #GIT_REPOSITORY https://github.com/google/googletest.git
-    #GIT_TAG release-1.11.0
-    SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/googletest/"
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG release-1.11.0
+    #SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/googletest/"
 )
 FetchContent_MakeAvailable(googletest)
 
