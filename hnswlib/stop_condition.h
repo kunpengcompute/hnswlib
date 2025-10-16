@@ -1,12 +1,32 @@
 #pragma once
 #include "space_l2.h"
 #include "space_ip.h"
+#include "space_ip_template.h"
+#include "space_l2_template.h"
 #include <assert.h>
 #include <unordered_map>
 
+
+namespace hnswlib {
+template<typename T>
+inline float InnerProductTemplate(const void*, const void*, const void*);
+
+template<typename T>
+inline float L2SqrTemplate(const void*, const void*, const void*);
+}
+
+namespace hnswlib {
+inline float InnerProductFloat(const void* a, const void* b, const void* q) {
+    return InnerProductTemplate<float>(a, b, q);
+}
+inline float L2SqrFloat(const void* a, const void* b, const void* q) {
+    return L2SqrTemplate<float>(a, b, q);
+}
+}
+
 #if defined(HNSWLIB_USE_ARM)
-#define L2Sqr L2SqrTemplate<float>
-#define InnerProductDistance InnerProductTemplate<float>
+#define L2Sqr (&hnswlib::L2SqrFloat)
+#define InnerProductDistance (&hnswlib::InnerProductFloat)
 #endif
 
 namespace hnswlib {

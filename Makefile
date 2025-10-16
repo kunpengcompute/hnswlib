@@ -1,55 +1,50 @@
-# ================= Arm 构建（四种测试形式）=================
+ARCH := $(shell uname -m)
 
-CXX ?= g++
-INCLUDES := -I./ -I./hnswlib -I./python_bindings
-# 通用优化与并行
-COMMON_FLAGS ?= -std=c++17 -fPIC -Ofast -fopenmp
-# 允许从外部覆盖，例如 make ARCH_FLAGS="-march=armv9-a+fp16+dotprod"
-ARCH_FLAGS ?= -march=armv8.2-a+dotprod
-ARCH_FLAGS_SVE ?= -march=armv8.2-a+dotprod+sve
-ARCH_FLAGS_FP16 ?= -march=armv8.2-a+fp16+dotprod
-ARCH_FLAGS_SVE_FP16 ?= -march=armv8.2-a+fp16+dotprod+sve
+CXX = g++
+LDFLAGS = -lhdf5_cpp -lhdf5
+SRCS = src/config_parser.cpp src/datasets.cpp src/test_result.cpp src/main.cpp
+ROOT = /home/lzy/hnswlib/kp/hnswlib
+HNSWLIBROOT = /home/lzy/hnswlib/kp/hnswlib/hnswlib/
+CXXFLAGS = -std=c++17 -fPIC -Ofast -Iinclude -I${ROOT}/include -fopenmp
 
-# 依赖库（可通过 make HDF5_LIBS="..." 覆盖）
-HDF5_LIBS ?= -lhdf5_cpp -lhdf5
-NUMA_LIBS ?= -lnuma
-LIBS := $(HDF5_LIBS) $(NUMA_LIBS)
+ifeq ($(ARCH),aarch64)
+	CXXFLAGS += -march=armv8.2-a+dotprod+fp16+sve
+else
+	ONEAPIROOT = /opt/intel/oneapi
+	CXXFLAGS += -m64 -DMKL_ILP64  -I${ONEAPIROOT}/mkl/2025.0/include
+	LDFLAGS += -L${ONEAPIROOT}/mkl/2025.0/lib/ -L${ONEAPIROOT}/compiler/2025.0/lib/ -Wl,--no-as-needed -lgomp -lpthread -lm -ldl -DHNSWERR=std::cerr
+endif
 
-# 源文件
-SRC_FP32 := hnswlib_test.cpp
-SRC_FP16 := hnswlib_test_fp16.cpp
+ifeq ($(ARCH),aarch64)
+ifeq ($(MAKECMDGOALS), hnswlib_sve_test)
+	TARGET = hnswlib_sve_test
+	DEFINES = -DHNSWLIB_TEST
+	CXXFLAGS += -I${HNSWLIBROOT} -DUSE_SVE -DHNSWLIB_USE_ARM
+	SRCS += src/hnswlib_index_fp16.cpp
+else ifeq ($(MAKECMDGOALS), hnswlib_neon_test)
+	TARGET = hnswlib_neon_test
+	DEFINES = -DHNSWLIB_TEST
+	CXXFLAGS += -I${HNSWLIBROOT} -DUSE_NEON -DHNSWLIB_USE_ARM
+	SRCS += src/hnswlib_index_fp16.cpp
+else ifeq ($(MAKECMDGOALS), hnswlib_fp16_sve_test)
+	TARGET = hnswlib_fp16_sve_test
+	DEFINES = -DHNSWLIB_FP16_TEST
+	CXXFLAGS += -I${HNSWLIBROOT} -DHNSWLIB_ENABLE_FP16 -DUSE_SVE -DHNSWLIB_USE_ARM
+	SRCS += src/hnswlib_index_fp16.cpp
+else ifeq ($(MAKECMDGOALS), hnswlib_fp16_neon_test)
+	TARGET = hnswlib_fp16_neon_test
+	DEFINES = -DHNSWLIB_FP16_TEST
+	CXXFLAGS += -I${HNSWLIBROOT} -DHNSWLIB_ENABLE_FP16 -DUSE_NEON -DHNSWLIB_USE_ARM
+	SRCS += src/hnswlib_index_fp16.cpp
+endif
+else
+ifeq ($(MAKECMDGOALS), hnswlib_test)
+	TARGET = hnswlib_test
+	DEFINES = -DHNSWLIB_TEST
+	CXXFLAGS += -I${HNSWLIBROOT}
+	SRCS += src/hnswlib_index.cpp
+endif
+endif
 
-# 目标名
-BIN_FP32_NEON := test_fp32_neon
-BIN_FP32_SVE  := test_fp32_sve
-BIN_FP16_NEON := test_fp16_neon
-BIN_FP16_SVE  := test_fp16_sve
-
-# 1) FP32 + NEON（不启用 SVE）
-$(BIN_FP32_NEON): $(SRC_FP32)
-	$(CXX) $(COMMON_FLAGS) $(ARCH_FLAGS) $(INCLUDES) -DUSE_NEON -o $@ $< $(LIBS)
-
-# 2) FP32 + SVE
-$(BIN_FP32_SVE): $(SRC_FP32)
-	$(CXX) $(COMMON_FLAGS) $(ARCH_FLAGS_SVE) $(INCLUDES) -DUSE_SVE -o $@ $< $(LIBS)
-
-# 3) FP16 + NEON（端到端 FP16，不启用 SVE）
-$(BIN_FP16_NEON): $(SRC_FP16)
-	$(CXX) $(COMMON_FLAGS) $(ARCH_FLAGS_FP16) $(INCLUDES) -DUSE_NEON -DHNSWLIB_ENABLE_FP16 -o $@ $< $(LIBS)
-
-# 4) FP16 + SVE（端到端 FP16 + SVE）
-$(BIN_FP16_SVE): $(SRC_FP16)
-	$(CXX) $(COMMON_FLAGS) $(ARCH_FLAGS_SVE_FP16) $(INCLUDES) -DUSE_SVE -DHNSWLIB_ENABLE_FP16 -o $@ $< $(LIBS)
-
-# 便捷聚合目标
-arm_all: $(BIN_FP32_NEON) $(BIN_FP32_SVE) $(BIN_FP16_NEON) $(BIN_FP16_SVE)
-
-.PHONY: arm_all fp32_neon fp32_sve fp16_neon fp16_sve
-fp32_neon: $(BIN_FP32_NEON)
-fp32_sve:  $(BIN_FP32_SVE)
-fp16_neon: $(BIN_FP16_NEON)
-fp16_sve:  $(BIN_FP16_SVE)
-
-# 清理本地二进制
-clean_arm:
-	rm -f $(BIN_FP32_NEON) $(BIN_FP32_SVE) $(BIN_FP16_NEON) $(BIN_FP16_SVE)
+$(TARGET):
+	$(CXX) $(CXXFLAGS) $(SRCS) $(LDFLAGS) $(DEFINES) -o $@
