@@ -42,7 +42,7 @@ class BaseMultiVectorSpace : public SpaceInterface<float> {
 
 template<typename DOCIDTYPE>
 class MultiVectorL2Space : public BaseMultiVectorSpace<DOCIDTYPE> {
-    DISTFUNC fstdistfunc_;
+    DISTFUNC<float> fstdistfunc_;
     size_t data_size_;
     size_t vector_size_;
     size_t dim_;
@@ -79,7 +79,7 @@ class MultiVectorL2Space : public BaseMultiVectorSpace<DOCIDTYPE> {
         return data_size_;
     }
 
-    DISTFUNC get_dist_func() override {
+    DISTFUNC<float> get_dist_func() override {
         return fstdistfunc_;
     }
 
@@ -101,7 +101,7 @@ class MultiVectorL2Space : public BaseMultiVectorSpace<DOCIDTYPE> {
 
 template<typename DOCIDTYPE>
 class MultiVectorInnerProductSpace : public BaseMultiVectorSpace<DOCIDTYPE> {
-    DISTFUNC fstdistfunc_;
+    DISTFUNC<float> fstdistfunc_;
     size_t data_size_;
     size_t vector_size_;
     size_t dim_;
@@ -148,7 +148,7 @@ class MultiVectorInnerProductSpace : public BaseMultiVectorSpace<DOCIDTYPE> {
         return data_size_;
     }
 
-    DISTFUNC get_dist_func() override {
+    DISTFUNC<float> get_dist_func() override {
         return fstdistfunc_;
     }
 
