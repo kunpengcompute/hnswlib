@@ -12,11 +12,11 @@
 #include <algorithm>
 #include <cmath>
 #include <set>
-#include "../../hnswlib.h"
-#include "../../space_factory.h"
-#include "../../bruteforce_template.h"
-#include "../../hnswalg_template.h"
-#include "../../data_type_converter.h"
+#include "../../hnswlib/hnswlib.h"
+#include "../../hnswlib/space_factory.h"
+#include "../../hnswlib/bruteforce_template.h"
+#include "../../hnswlib/hnswalg_template.h"
+#include "../../hnswlib/data_type_converter.h"
 
 // 确保float16_t类型定义
 #if !defined(__ARM_FEATURE_FP16_SCALAR_ARITHMETIC) && !defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC)
