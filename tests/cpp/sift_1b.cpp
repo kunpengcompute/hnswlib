@@ -169,7 +169,7 @@ test_approx(
     unsigned char *massQ,
     size_t vecsize,
     size_t qsize,
-    HierarchicalNSW<int> &appr_alg,
+    HierarchicalNSWI &appr_alg,
     size_t vecdim,
     vector<std::priority_queue<std::pair<int, labeltype>>> &answers,
     size_t k) {
@@ -204,7 +204,7 @@ test_vs_recall(
     unsigned char *massQ,
     size_t vecsize,
     size_t qsize,
-    HierarchicalNSW<int> &appr_alg,
+    HierarchicalNSWI &appr_alg,
     size_t vecdim,
     vector<std::priority_queue<std::pair<int, labeltype>>> &answers,
     size_t k) {
@@ -296,14 +296,14 @@ void sift_test1B() {
     int in = 0;
     L2SpaceI l2space(vecdim);
 
-    HierarchicalNSW<int> *appr_alg;
+    HierarchicalNSWI *appr_alg;
     if (exists_test(path_index)) {
         cout << "Loading index from " << path_index << ":\n";
-        appr_alg = new HierarchicalNSW<int>(&l2space, path_index, false);
+        appr_alg = new HierarchicalNSWI(&l2space, path_index, false);
         cout << "Actual memory usage: " << getCurrentRSS() / 1000000 << " Mb \n";
     } else {
         cout << "Building index:\n";
-        appr_alg = new HierarchicalNSW<int>(&l2space, vecsize, M, efConstruction);
+        appr_alg = new HierarchicalNSWI(&l2space, vecsize, M, efConstruction);
 
         input.read((char *) &in, 4);
         if (in != 128) {
