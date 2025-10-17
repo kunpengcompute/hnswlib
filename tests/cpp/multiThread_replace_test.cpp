@@ -57,7 +57,7 @@ inline void ParallelFor(size_t start, size_t end, size_t numThreads, Function fn
     }
 }
 
-
+#ifdef HNSWLIB_ENABLE_FP16
 int main() {
     std::cout << "Running multithread load test" << std::endl;
     int d = 16;
@@ -69,7 +69,80 @@ int main() {
     rng.seed(47);
     std::uniform_real_distribution<> distrib_real;
 
-    hnswlib::L2Space space(d);
+    hnswlib::L2SpaceHalf space(d);
+
+    // generate batch1 and batch2 data
+    float* batch1 = new float[d * max_elements];
+    for (int i = 0; i < d * max_elements; i++) {
+        batch1[i] = distrib_real(rng);
+    }
+    float* batch2 = new float[d * num_elements];
+    for (int i = 0; i < d * num_elements; i++) {
+        batch2[i] = distrib_real(rng);
+    }
+    float16_t* batch1_fp16 = new float16_t[d * max_elements];
+    for (size_t i = 0; i < d * max_elements; i++) {
+        batch1_fp16[i] = static_cast<float16_t>(batch1[i]);
+    }
+    float16_t* batch2_fp16 = new float16_t[d * num_elements];
+    for (size_t i = 0; i < d * num_elements; i++) {
+        batch2_fp16[i] = static_cast<float16_t>(batch2[i]);
+    }
+
+    // generate random labels to delete them from index
+    std::vector<int> rand_labels(max_elements);
+    for (int i = 0; i < max_elements; i++) {
+        rand_labels[i] = i;
+    }
+    std::shuffle(rand_labels.begin(), rand_labels.end(), rng);
+
+    int iter = 0;
+    while (iter < 200) {
+        hnswlib::HierarchicalNSWHalf* alg_hnsw = new hnswlib::HierarchicalNSWHalf(&space, max_elements, 16, 200, 123, true);
+
+        // add batch1 data
+        ParallelFor(0, max_elements, num_threads, [&](size_t row, size_t threadId) {
+            alg_hnsw->addPoint((void*)(batch1_fp16 + d * row), row);
+        });
+
+        // delete half random elements of batch1 data
+        for (int i = 0; i < num_elements; i++) {
+            alg_hnsw->markDelete(rand_labels[i]);
+        }
+
+        // replace deleted elements with batch2 data
+        ParallelFor(0, num_elements, num_threads, [&](size_t row, size_t threadId) {
+            int label = rand_labels[row] + max_elements;
+            alg_hnsw->addPoint((void*)(batch2_fp16 + d * row), label, true);
+        });
+
+        iter += 1;
+
+        delete alg_hnsw;
+    }
+    
+    std::cout << "Finish" << std::endl;
+
+    delete[] batch1;
+    delete[] batch2;
+    delete[] batch1_fp16;
+    delete[] batch2_fp16;
+    return 0;
+}
+
+#else
+int main() {
+    std::cout << "Running multithread load test" << std::endl;
+    int d = 16;
+    int num_elements = 1000;
+    int max_elements = 2 * num_elements;
+    int num_threads = 50;
+
+    std::mt19937 rng;
+    rng.seed(47);
+    std::uniform_real_distribution<> distrib_real;
+
+    hnswlib::L2SpaceF space(d);
 
     // generate batch1 and batch2 data
     float* batch1 = new float[d * max_elements];
@@ -90,7 +163,7 @@ int main() {
 
     int iter = 0;
     while (iter < 200) {
-        hnswlib::HierarchicalNSW<float>* alg_hnsw = new hnswlib::HierarchicalNSW<float>(&space, max_elements, 16, 200, 123, true);
+        hnswlib::HierarchicalNSWFloat* alg_hnsw = new hnswlib::HierarchicalNSWFloat(&space, max_elements, 16, 200, 123, true);
 
         // add batch1 data
         ParallelFor(0, max_elements, num_threads, [&](size_t row, size_t threadId) {
@@ -119,3 +192,4 @@ int main() {
     delete[] batch2;
     return 0;
 }
+#endif

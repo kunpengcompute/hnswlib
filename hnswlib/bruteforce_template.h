@@ -20,7 +20,6 @@
 #include <fstream>
 #include <mutex>
 #include <algorithm>
-#include <assert.h>
 #include "hnswlib.h"
 
 // 确保float16_t类型定义
@@ -36,15 +35,22 @@ typedef __fp16 float16_t;
 namespace hnswlib {
 
 template<typename T>
-class BruteforceSearch : public AlgorithmInterface<float> {
+using PriorityType = typename std::conditional<
+    std::is_same<T, float>::value || std::is_same<T, float16_t>::value,
+    float,
+    int
+>::type;
+
+template<typename T>
+class BruteforceSearch : public AlgorithmInterface<PriorityType<T>> {
 public:
     char *data_;
     size_t maxelements_;
-    size_t cur_element_count__;
+    size_t cur_element_count_;
     size_t size_per_element_;
 
     size_t data_size_;
-    DISTFUNC fstdistfunc_;
+    DISTFUNC<PriorityType<T>> fstdistfunc_;
     void *dist_func_param_;
     std::mutex index_lock;
 
@@ -128,23 +134,25 @@ public:
         cur_element_count_--;
     }
 
-    std::priority_queue<std::pair<float, labeltype>>
+    std::priority_queue<std::pair<PriorityType<T>, labeltype>>
     searchKnn(const void *query_data, size_t k, BaseFilterFunctor* isIdAllowed = nullptr) const override {
-        assert(k <= cur_element_count_);
-        std::priority_queue<std::pair<float, labeltype>> topResults;
-        if (cur_element_count_ == 0) {
-            return topResults;  
-        }     
+        if (k > cur_element_count_) {
+            throw std::runtime_error("Assertion failed: k <= cur_element_count_. k: " +
+                                     std::to_string(k) + ", cur_element_count_: " +
+                                     std::to_string(cur_element_count_));
+        }
+        std::priority_queue<std::pair<PriorityType<T>, labeltype>> topResults;
+        if (cur_element_count_ == 0) return topResults;
         for (int i = 0; i < k; i++) {
-            float dist = fstdistfunc_(query_data, data_ + size_per_element_ * i, dist_func_param_);
+            PriorityType<T> dist = fstdistfunc_(query_data, data_ + size_per_element_ * i, dist_func_param_);
             labeltype label = *((labeltype*) (data_ + size_per_element_ * i + data_size_));
             if ((!isIdAllowed) || (*isIdAllowed)(label)) {
                 topResults.emplace(dist, label);
             }
         }
-        float lastdist = topResults.empty() ? std::numeric_limits<float>::max() : topResults.top().first;
+        PriorityType<T> lastdist = topResults.empty() ? std::numeric_limits<PriorityType<T>>::max() : topResults.top().first;
         for (int i = k; i < cur_element_count_; i++) {
-            float dist = fstdistfunc_(query_data, data_ + size_per_element_ * i, dist_func_param_);
+            PriorityType<T> dist = fstdistfunc_(query_data, data_ + size_per_element_ * i, dist_func_param_);
             if (dist <= lastdist) {
                 labeltype label = *((labeltype *) (data_ + size_per_element_ * i + data_size_));
                 if ((!isIdAllowed) || (*isIdAllowed)(label)) {
@@ -161,10 +169,10 @@ public:
         return topResults;
     }
 
-    std::vector<std::pair<float, labeltype>>
+    std::vector<std::pair<PriorityType<T>, labeltype>>
     searchKnnCloserFirst(const void* query_data, size_t k, BaseFilterFunctor* isIdAllowed = nullptr) const override {
         auto result = searchKnn(query_data, k, isIdAllowed);
-        std::vector<std::pair<float, labeltype>> result_vec;
+        std::vector<std::pair<PriorityType<T>, labeltype>> result_vec;
         while (!result.empty()) {
             result_vec.push_back(result.top());
             result.pop();
@@ -186,7 +194,7 @@ public:
         output.close();
     }
 
-    void loadIndex(const std::string &location, SpaceInterface<float> *s) {
+    void loadIndex(const std::string &location, SpaceInterface<PriorityType<T>> *s) {
         std::ifstream input(location, std::ios::binary);
         std::streampos position;
 
@@ -213,11 +221,11 @@ public:
     }
 
     // 类型安全的搜索接口
-    std::priority_queue<std::pair<float, labeltype>> searchKnn(const T *query_data, size_t k, BaseFilterFunctor* isIdAllowed = nullptr) const {
+    std::priority_queue<std::pair<PriorityType<T>, labeltype>> searchKnn(const T *query_data, size_t k, BaseFilterFunctor* isIdAllowed = nullptr) const {
         return searchKnn(static_cast<const void*>(query_data), k, isIdAllowed);
     }
 
-    std::vector<std::pair<float, labeltype>> searchKnnCloserFirst(const T *query_data, size_t k, BaseFilterFunctor* isIdAllowed = nullptr) const {
+    std::vector<std::pair<PriorityType<T>, labeltype>> searchKnnCloserFirst(const T *query_data, size_t k, BaseFilterFunctor* isIdAllowed = nullptr) const {
         return searchKnnCloserFirst(static_cast<const void*>(query_data), k, isIdAllowed);
     }
 

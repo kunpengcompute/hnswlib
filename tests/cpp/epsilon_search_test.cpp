@@ -3,6 +3,7 @@
 
 typedef unsigned int docidtype;
 typedef float dist_t;
+typedef __fp16 float16_t;
 
 int main() {
     int dim = 16;               // Dimension of the elements
@@ -18,9 +19,9 @@ int main() {
                                              // this parameter is similar to ef
 
     // Initing index
-    hnswlib::L2Space space(dim);
+    hnswlib::L2SpaceF space(dim);
     hnswlib::BruteforceSearch<dist_t>* alg_brute = new hnswlib::BruteforceSearch<dist_t>(&space, max_elements);
-    hnswlib::HierarchicalNSW<dist_t>* alg_hnsw = new hnswlib::HierarchicalNSW<dist_t>(&space, max_elements, M, ef_construction);
+    hnswlib::HierarchicalNSWFloat* alg_hnsw = new hnswlib::HierarchicalNSWFloat(&space, max_elements, M, ef_construction);
 
     // Generate random data
     std::mt19937 rng;
@@ -41,7 +42,7 @@ int main() {
         alg_brute->addPoint(point_data, label);
     }
     std::cout << "Index is ready\n";
-
+    
     // Query random vectors
     for (int i = 0; i < num_queries; i++) {
         float* query_data = new float[dim];

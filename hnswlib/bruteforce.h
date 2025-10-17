@@ -3,7 +3,6 @@
 #include <fstream>
 #include <mutex>
 #include <algorithm>
-#include <assert.h>
 
 namespace hnswlib {
 template<typename dist_t>
@@ -93,6 +92,10 @@ class BruteforceSearch : public AlgorithmInterface<dist_t> {
 
         dict_external_to_internal.erase(found);
 
+        if (cur_element_count_ == 0) {
+            return;
+        }
+
         size_t cur_c = found->second;
         labeltype label = *((labeltype*)(data_ + size_per_element_ * (cur_element_count_-1) + data_size_));
         dict_external_to_internal[label] = cur_c;
@@ -105,7 +108,11 @@ class BruteforceSearch : public AlgorithmInterface<dist_t> {
 
     std::priority_queue<std::pair<dist_t, labeltype >>
     searchKnn(const void *query_data, size_t k, BaseFilterFunctor* isIdAllowed = nullptr) const {
-        assert(k <= cur_element_count_);
+        if (k > cur_element_count_) {
+            throw std::runtime_error("Assertion failed: k <= cur_element_count_. k: " +
+                                     std::to_string(k) + ", cur_element_count_: " +
+                                     std::to_string(cur_element_count_));
+        }
         std::priority_queue<std::pair<dist_t, labeltype >> topResults;
         if (cur_element_count_ == 0) return topResults;
         for (int i = 0; i < k; i++) {

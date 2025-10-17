@@ -72,7 +72,7 @@ unsigned int divisor = 1;
     }
 };
 
-
+#ifdef HNSWLIB_ENABLE_FP16
 int main() {
     int dim = 16;               // Dimension of the elements
     int max_elements = 10000;   // Maximum number of elements, should be known beforehand
@@ -82,8 +82,63 @@ int main() {
     int num_threads = 20;       // Number of threads for operations with index
 
     // Initing index
-    hnswlib::L2Space space(dim);
-    hnswlib::HierarchicalNSW<float>* alg_hnsw = new hnswlib::HierarchicalNSW<float>(&space, max_elements, M, ef_construction);
+    hnswlib::L2SpaceHalf space(dim);
+    hnswlib::HierarchicalNSWHalf* alg_hnsw = new hnswlib::HierarchicalNSWHalf(&space, max_elements, M, ef_construction);
+
+    // Generate random data
+    std::mt19937 rng;
+    rng.seed(47);
+    std::uniform_real_distribution<> distrib_real;
+    float* data = new float[dim * max_elements];
+    for (int i = 0; i < dim * max_elements; i++) {
+        data[i] = distrib_real(rng);
+    }
+    float16_t* data_fp16 = new float16_t[dim * max_elements];
+    for (int i = 0; i < dim * max_elements; i++) {
+        data_fp16[i] = static_cast<float16_t>(data[i]);
+    }
+
+    // Add data to index
+    ParallelFor(0, max_elements, num_threads, [&](size_t row, size_t threadId) {
+        alg_hnsw->addPoint((void*)(data_fp16 + dim * row), row);
+    });
+
+    // Create filter that allows only even labels
+    PickDivisibleIds pickIdsDivisibleByTwo(2);
+
+    // Query the elements for themselves with filter and check returned labels
+    int k = 10;
+    std::vector<hnswlib::labeltype> neighbors(max_elements * k);
+    ParallelFor(0, max_elements, num_threads, [&](size_t row, size_t threadId) {
+        std::priority_queue<std::pair<float, hnswlib::labeltype>> result = alg_hnsw->searchKnn(data_fp16 + dim * row, k, &pickIdsDivisibleByTwo);
+        for (int i = 0; i < k; i++) {
+            hnswlib::labeltype label = result.top().second;
+            result.pop();
+            neighbors[row * k + i] = label;
+        }
+    });
+
+    for (hnswlib::labeltype label: neighbors) {
+        if (label % 2 == 1) std::cout << "Error: found odd label\n";
+    }
+
+    delete[] data;
+    delete[] data_fp16;
+    delete alg_hnsw;
+    return 0;
+}
+#else
+int main() {
+    int dim = 16;               // Dimension of the elements
+    int max_elements = 10000;   // Maximum number of elements, should be known beforehand
+    int M = 16;                 // Tightly connected with internal dimensionality of the data
+                                // strongly affects the memory consumption
+    int ef_construction = 200;  // Controls index search speed/build speed tradeoff
+    int num_threads = 20;       // Number of threads for operations with index
+
+    // Initing index
+    hnswlib::L2SpaceF space(dim);
+    hnswlib::HierarchicalNSWFloat* alg_hnsw = new hnswlib::HierarchicalNSWFloat(&space, max_elements, M, ef_construction);
 
     // Generate random data
     std::mt19937 rng;
@@ -122,3 +177,4 @@ int main() {
     delete alg_hnsw;
     return 0;
 }
+#endif

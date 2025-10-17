@@ -22,6 +22,7 @@
     #endif
 #endif
 
+// ================== 标准库与基础类型 ==================
 #include <queue>
 #include <vector>
 #include <iostream>
@@ -38,6 +39,7 @@
 #include <algorithm>
 
 namespace hnswlib {
+// 通用标签类型
 typedef size_t labeltype;
 
 class BaseFilterFunctor {
@@ -76,18 +78,33 @@ static void readBinaryPOD(std::istream &in, T &podRef) {
     in.read((char *) &podRef, sizeof(T));
 }
 
-// template<typename MTYPE>
-using DISTFUNC = float(*)(const void *, const void *, const void *);
+#if defined(HNSWLIB_USE_ARM)
+template<typename MTYPE>
+using DISTFUNC = typename std::conditional<
+    std::is_same<MTYPE, float>::value || std::is_same<MTYPE, __fp16>::value,
+    float(*)(const void *, const void *, const void *),
+    int(*)(const void *, const void *, const void *)
+>::type;
+#else
+template<typename MTYPE>
+using DISTFUNC = MTYPE(*)(const void *, const void *, const void *);
+#endif
 
+// 空间接口
+// 具体空间实现（如L2、IP）需继承并实现
+// 支持float32/float16（ARM）
 template<typename MTYPE>
 class SpaceInterface {
  public:
     virtual size_t get_data_size() = 0;
-    virtual DISTFUNC get_dist_func() = 0;
+    virtual DISTFUNC<MTYPE> get_dist_func() = 0;
     virtual void *get_dist_func_param() = 0;
     virtual ~SpaceInterface() {}
 };
 
+// 算法接口
+// 具体算法（如HNSW、Bruteforce）需继承并实现
+// 支持float32/float16（ARM）
 template<typename dist_t>
 class AlgorithmInterface {
  public:
@@ -107,31 +124,30 @@ AlgorithmInterface<dist_t>::searchKnnCloserFirst(const void* query_data, size_t 
     std::vector<std::pair<dist_t, labeltype>> result;
     auto ret = searchKnn(query_data, k, isIdAllowed);
     {
-    size_t sz = ret.size();
-    result.resize(sz);
-    while (!ret.empty()) {
-        result[--sz] = ret.top();
-        ret.pop();
-        }
+        size_t sz = ret.size();
+        result.resize(sz);
+        while (!ret.empty()) {
+            result[--sz] = ret.top();
+            ret.pop();
+            }
     }
     return result;
 }
 
 }  // namespace hnswlib
 
-// ========== 平台相关空间实现自动包含 ========== //
 #if defined(HNSWLIB_USE_X86)
     #include "space_l2.h"
     #include "space_ip.h"
     #include "hnswalg.h"
+    #include "bruteforce.h"
 #elif defined(HNSWLIB_USE_ARM)
     #include "space_l2_template.h"
     #include "space_ip_template.h"
     #include "hnswalg_template.h"
+    #include "bruteforce_template.h"
+    #include "data_type_converter.h"
 #endif
 
-// ========== 通用工具/其它模块 ========== //
 #include "stop_condition.h"
-#include "bruteforce_template.h"
 #include "visited_list_pool.h"
-#include "data_type_converter.h"

@@ -18,14 +18,14 @@
 
 #if defined(HNSWLIB_USE_ARM)
 
-#include <arm_sve.h>
-#include <arm_neon.h>
 #include <cmath>
 #include <iostream>
 #include <vector>
 #include <random>
 #include <memory>
 #include <cstring>
+#include <arm_sve.h>
+#include <arm_neon.h>
 #include "hnswlib.h"
 
 #if !defined(__ARM_FEATURE_FP16_SCALAR_ARITHMETIC) && !defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC)
@@ -51,7 +51,6 @@ static float InnerProductTemplate(const void *pVect1v, const void *pVect2v, cons
 }
 
 #if defined(USE_SVE)
-
 template<typename T>
 static float InnerProductSIMD16ExtTemplate(const void *pVect1v, const void *pVect2v, const void *qty_ptr) {
     T *pVect1 = (T *)pVect1v;
@@ -86,56 +85,9 @@ static float InnerProductSIMD16ExtTemplate(const void *pVect1v, const void *pVec
             v1 = svcvt_f32_f16_z(pg8_b32, svreinterpret_f16_u32(svld1uh_u32(pg8_b32, (const uint16_t *)pVect1)));
             v2 = svcvt_f32_f16_z(pg8_b32, svreinterpret_f16_u32(svld1uh_u32(pg8_b32, (const uint16_t *)pVect2)));
         }
-        pVect1 += 8;
-        pVect2 += 8;
-        sum = svadd_f32_z(pg8_b32, sum, svmul_f32_z(pg8_b32, v1, v2));
-    }
-
-    return -svaddv_f32(pg8_b32, sum);
-}
-
-template<typename T>
-static float InnerProductSIMDResidualTemplate(const void *pVect1v, const void *pVect2v, const void *qty_ptr) {
-    auto *pVect1 = (T *)pVect1v;
-    auto *pVect2 = (T *)pVect2v;
-    size_t qty = *((size_t *)qty_ptr);
-    size_t vec_8x = qty >> 3 << 3;
-    const T *pEnd1 = pVect1 + vec_8x;
-    const T *pEnd2 = pVect2 + vec_8x;
-    size_t residual = qty - vec_8x;
-
-    svfloat32_t sum = svdup_f32(0.0f);
-    svbool_t pg8_b32 = svwhilelt_b32(0, 8);
-
-    while (pVect1 < pEnd1) {
-        svfloat32_t v1, v2;
-
-        if constexpr (std::is_same_v<T, float>) {
-            v1 = svld1_f32(pg8_b32, pVect1);
-            v2 = svld1_f32(pg8_b32, pVect2);
-        } else if constexpr (std::is_same_v<T, float16_t>) {
-            v1 = svcvt_f32_f16_z(pg8_b32, svreinterpret_f16_u32(svld1uh_u32(pg8_b32, (const uint16_t *)pVect1)));
-            v2 = svcvt_f32_f16_z(pg8_b32, svreinterpret_f16_u32(svld1uh_u32(pg8_b32, (const uint16_t *)pVect2)));
-        }
-        pVect1 += 8;
-        pVect2 += 8;
-        sum = svadd_f32_z(pg8_b32, sum, svmul_f32_z(pg8_b32, v1, v2));
-    }
-
-    if (residual) {
-        T resi_vec[16] = {0};
-        memcpy(resi_vec, pEnd1, residual * sizeof(T));
-        memcpy(resi_vec + 8, pEnd2, residual * sizeof(T));
-        svfloat32_t v1, v2;
-
-        if constexpr (std::is_same_v<T, float>) {
-            v1 = svld1_f32(pg8_b32, resi_vec);
-            v2 = svld1_f32(pg8_b32, resi_vec + 8);
-        } else if constexpr (std::is_same_v<T, float16_t>) {
-            v1 = svcvt_f32_f16_z(pg8_b32, svreinterpret_f16_u32(svld1uh_u32(pg8_b32, (const uint16_t *)resi_vec)));
-            v2 = svcvt_f32_f16_z(pg8_b32, svreinterpret_f16_u32(svld1uh_u32(pg8_b32, (const uint16_t *)resi_vec + 8)));
-        }
         
+        pVect1 += 8;
+        pVect2 += 8;
         sum = svadd_f32_z(pg8_b32, sum, svmul_f32_z(pg8_b32, v1, v2));
     }
 
@@ -161,7 +113,6 @@ static float InnerProductSIMD4ExtTemplate(const void *pVect1v, const void *pVect
             v1 = svcvt_f32_f16_z(pg4_b32, svreinterpret_f16_u32(svld1uh_u32(pg4_b32, (const uint16_t *)pVect1)));
             v2 = svcvt_f32_f16_z(pg4_b32, svreinterpret_f16_u32(svld1uh_u32(pg4_b32, (const uint16_t *)pVect2)));
         }
-
         pVect1 += 4;
         pVect2 += 4;
         sum = svadd_f32_z(pg4_b32, sum, svmul_f32_z(pg4_b32, v1, v2));
@@ -171,19 +122,41 @@ static float InnerProductSIMD4ExtTemplate(const void *pVect1v, const void *pVect
 }
 
 template<typename T>
+static float InnerProductSIMD16ExtResidualsTemplate(const void *pVect1v, const void *pVect2v, const void *qty_ptr) {
+    size_t qty = *((size_t *)qty_ptr);
+    size_t qty16 = qty >> 4 << 4;
+
+    float res = InnerProductSIMD16ExtTemplate<T>(pVect1v, pVect2v, &qty16);
+
+    size_t qty_4 = (qty - qty16) >> 2 << 2;
+    T *pVect1 = (T *)pVect1v + qty16;
+    T *pVect2 = (T *)pVect2v + qty16;
+    float res_4 = InnerProductSIMD4ExtTemplate<T>(pVect1, pVect2, &qty_4);
+
+    size_t qty_left = qty - qty16 - qty_4;
+    pVect1 = (T *)pVect1v + qty_4;
+    pVect2 = (T *)pVect2v + qty_4;
+    float res_tail = InnerProductTemplate<T>(pVect1, pVect2, &qty_left);
+
+    return (res + res_4 + res_tail);
+}
+
+template<typename T>
 static float InnerProductSIMD4ExtResidualsTemplate(const void *pVect1v, const void *pVect2v, const void *qty_ptr) {
     size_t qty = *((size_t *)qty_ptr);
     size_t qty4 = qty >> 2 << 2;
+
     float res = InnerProductSIMD4ExtTemplate<T>(pVect1v, pVect2v, &qty4);
     size_t qty_left = qty - qty4;
+
     T *pVect1 = (T *)pVect1v + qty4;
     T *pVect2 = (T *)pVect2v + qty4;
-    float res_tail = InnerProductSIMDResidualTemplate<T>(pVect1, pVect2, &qty_left);
+    float res_tail = InnerProductTemplate<T>(pVect1, pVect2, &qty_left);
+
     return (res + res_tail);
 }
 
 #elif defined(USE_NEON)
-
 template<typename T>
 static float InnerProductSIMD16ExtTemplate(const void *pVect1v, const void *pVect2v, const void *qty_ptr) {
     T *pVect1 = (T *)pVect1v;
@@ -244,7 +217,7 @@ static float InnerProductSIMD16ExtTemplate(const void *pVect1v, const void *pVec
         sum = vaddq_f32(sum, vmulq_f32(v1, v2));
     }
 
-    return vaddvq_f32(sum);
+    return - vaddvq_f32(sum);
 }
 
 template<typename T>
@@ -278,51 +251,23 @@ static float InnerProductSIMD4ExtTemplate(const void *pVect1v, const void *pVect
 }
 
 template<typename T>
-static float InnerProductSIMDResidualTemplate(const void *pVect1v, const void *pVect2v, const void *qty_ptr) {
-    auto *pVect1 = (T *)pVect1v;
-    auto *pVect2 = (T *)pVect2v;
+static float InnerProductSIMD16ExtResidualsTemplate(const void *pVect1v, const void *pVect2v, const void *qty_ptr) {
     size_t qty = *((size_t *)qty_ptr);
-    size_t vec_4x = qty >> 2 << 2;
-    const T *pEnd1 = pVect1 + vec_4x;
-    const T *pEnd2 = pVect2 + vec_4x;
-    size_t residual = qty - vec_4x;
+    size_t qty16 = qty >> 4 << 4;
 
-    float32x4_t sum = vdupq_n_f32(0.0f);
+    float res = InnerProductSIMD16ExtTemplate<T>(pVect1v, pVect2v, &qty16);
 
-    while (pVect1 < pEnd1) {
-        float32x4_t v1, v2;
-        
-        if constexpr (std::is_same_v<T, float>) {
-            v1 = vld1q_f32(pVect1);
-            v2 = vld1q_f32(pVect2);
-        } else if constexpr (std::is_same_v<T, float16_t>) {
-            v1 = vcvt_f32_f16(vld1_f16(pVect1));
-            v2 = vcvt_f32_f16(vld1_f16(pVect2));
-        }
-        
-        pVect1 += 4;
-        pVect2 += 4;
-        sum = vaddq_f32(sum, vmulq_f32(v1, v2));
-    }
+    size_t qty_4 = (qty - qty16) >> 2 << 2;
+    T *pVect1 = (T *)pVect1v + qty16;
+    T *pVect2 = (T *)pVect2v + qty16;
+    float res_4 = InnerProductSIMD4ExtTemplate<T>(pVect1, pVect2, &qty_4);
 
-    if (residual) {
-        T resi_vec[16] = {0};
-        memcpy(resi_vec, pEnd1, residual * sizeof(T));
-        memcpy(resi_vec + 8, pEnd2, residual * sizeof(T));
+    size_t qty_left = qty - qty16 - qty_4;
+    pVect1 = (T *)pVect1v + qty_4;
+    pVect2 = (T *)pVect2v + qty_4;
+    float res_tail = InnerProductTemplate<T>(pVect1, pVect2, &qty_left);
 
-        float32x4_t v1, v2;
-        if constexpr (std::is_same_v<T, float>) {
-            v1 = vld1q_f32(resi_vec);
-            v2 = vld1q_f32(resi_vec + 8);
-        } else if constexpr (std::is_same_v<T, float16_t>) {
-            v1 = vcvt_f32_f16(vld1_f16(resi_vec));
-            v2 = vcvt_f32_f16(vld1_f16(resi_vec + 8));
-        }
-        
-        sum = vaddq_f32(sum, vmulq_f32(v1, v2));
-    }
-
-    return - vaddvq_f32(sum);
+    return (res + res_4 + res_tail);
 }
 
 template<typename T>
@@ -335,7 +280,7 @@ static float InnerProductSIMD4ExtResidualsTemplate(const void *pVect1v, const vo
 
     T *pVect1 = (T *)pVect1v + qty4;
     T *pVect2 = (T *)pVect2v + qty4;
-    float res_tail = InnerProductSIMDResidualTemplate<T>(pVect1, pVect2, &qty_left);
+    float res_tail = InnerProductTemplate<T>(pVect1, pVect2, &qty_left);
 
     return (res + res_tail);
 }
@@ -345,7 +290,7 @@ static float InnerProductSIMD4ExtResidualsTemplate(const void *pVect1v, const vo
 // 模板化内积空间类
 template<typename T>
 class InnerProductSpaceTemplate : public SpaceInterface<T> {
-    DISTFUNC fstdistfunc_;
+    DISTFUNC<float> fstdistfunc_;
     size_t data_size_;
     size_t dim_;
 
@@ -359,7 +304,7 @@ public:
         else if (dim % 4 == 0)
             fstdistfunc_ = InnerProductSIMD4ExtTemplate<T>;
         else if (dim > 16)
-            fstdistfunc_ = InnerProductSIMDResidualTemplate<T>;
+            fstdistfunc_ = InnerProductSIMD16ExtResidualsTemplate<T>;
         else if (dim > 4)
             fstdistfunc_ = InnerProductSIMD4ExtResidualsTemplate<T>;
 #endif
@@ -372,7 +317,7 @@ public:
         return data_size_;
     }
 
-    DISTFUNC get_dist_func() {
+    DISTFUNC<float> get_dist_func() {
         return fstdistfunc_;
     }
 

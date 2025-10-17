@@ -1,12 +1,31 @@
 #pragma once
 #include "space_l2.h"
 #include "space_ip.h"
-#include <assert.h>
+#include "space_ip_template.h"
+#include "space_l2_template.h"
 #include <unordered_map>
 
+
+namespace hnswlib {
+template<typename T>
+inline float InnerProductTemplate(const void*, const void*, const void*);
+
+template<typename T>
+inline float L2SqrTemplate(const void*, const void*, const void*);
+}
+
+namespace hnswlib {
+inline float InnerProductFloat(const void* a, const void* b, const void* q) {
+    return InnerProductTemplate<float>(a, b, q);
+}
+inline float L2SqrFloat(const void* a, const void* b, const void* q) {
+    return L2SqrTemplate<float>(a, b, q);
+}
+}
+
 #if defined(HNSWLIB_USE_ARM)
-#define L2Sqr L2SqrTemplate<float>
-#define InnerProductDistance InnerProductTemplate<float>
+#define L2Sqr (&hnswlib::L2SqrFloat)
+#define InnerProductDistance (&hnswlib::InnerProductFloat)
 #endif
 
 namespace hnswlib {
@@ -22,7 +41,7 @@ class BaseMultiVectorSpace : public SpaceInterface<float> {
 
 template<typename DOCIDTYPE>
 class MultiVectorL2Space : public BaseMultiVectorSpace<DOCIDTYPE> {
-    DISTFUNC fstdistfunc_;
+    DISTFUNC<float> fstdistfunc_;
     size_t data_size_;
     size_t vector_size_;
     size_t dim_;
@@ -59,7 +78,7 @@ class MultiVectorL2Space : public BaseMultiVectorSpace<DOCIDTYPE> {
         return data_size_;
     }
 
-    DISTFUNC get_dist_func() override {
+    DISTFUNC<float> get_dist_func() override {
         return fstdistfunc_;
     }
 
@@ -81,7 +100,7 @@ class MultiVectorL2Space : public BaseMultiVectorSpace<DOCIDTYPE> {
 
 template<typename DOCIDTYPE>
 class MultiVectorInnerProductSpace : public BaseMultiVectorSpace<DOCIDTYPE> {
-    DISTFUNC fstdistfunc_;
+    DISTFUNC<float> fstdistfunc_;
     size_t data_size_;
     size_t vector_size_;
     size_t dim_;
@@ -128,7 +147,7 @@ class MultiVectorInnerProductSpace : public BaseMultiVectorSpace<DOCIDTYPE> {
         return data_size_;
     }
 
-    DISTFUNC get_dist_func() override {
+    DISTFUNC<float> get_dist_func() override {
         return fstdistfunc_;
     }
 
@@ -205,7 +224,11 @@ class MultiVectorSearchStopCondition : public BaseSearchStopCondition<dist_t> {
         while (curr_num_docs_ > num_docs_to_search_) {
             dist_t dist_cand = candidates.back().first;
             dist_t dist_res = search_results_.top().first;
-            assert(dist_cand == dist_res);
+            if (dist_cand != dist_res) {
+                throw std::runtime_error("Assertion failed: dist_cand == dist_res. dist_cand: " +
+                                         std::to_string(dist_cand) + ", dist_res: " +
+                                         std::to_string(dist_res));
+            }
             DOCIDTYPE doc_id = search_results_.top().second;
             doc_counter_[doc_id] -= 1;
             if (doc_counter_[doc_id] == 0) {
@@ -229,7 +252,11 @@ class EpsilonSearchStopCondition : public BaseSearchStopCondition<dist_t> {
 
  public:
     EpsilonSearchStopCondition(float epsilon, size_t min_num_candidates, size_t max_num_candidates) {
-        assert(min_num_candidates <= max_num_candidates);
+        if (min_num_candidates > max_num_candidates) {
+            throw std::runtime_error("Assertion failed: min_num_candidates <= max_num_candidates. min_num_candidates: " +
+                                     std::to_string(min_num_candidates) + ", max_num_candidates: " +
+                                     std::to_string(max_num_candidates));
+        }
         epsilon_ = epsilon;
         min_num_candidates_ = min_num_candidates;
         max_num_candidates_ = max_num_candidates;
