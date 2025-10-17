@@ -3,7 +3,6 @@
 #include "space_ip.h"
 #include "space_ip_template.h"
 #include "space_l2_template.h"
-#include <assert.h>
 #include <unordered_map>
 
 
@@ -225,7 +224,11 @@ class MultiVectorSearchStopCondition : public BaseSearchStopCondition<dist_t> {
         while (curr_num_docs_ > num_docs_to_search_) {
             dist_t dist_cand = candidates.back().first;
             dist_t dist_res = search_results_.top().first;
-            assert(dist_cand == dist_res);
+            if (dist_cand != dist_res) {
+                throw std::runtime_error("Assertion failed: dist_cand == dist_res. dist_cand: " +
+                                         std::to_string(dist_cand) + ", dist_res: " +
+                                         std::to_string(dist_res));
+            }
             DOCIDTYPE doc_id = search_results_.top().second;
             doc_counter_[doc_id] -= 1;
             if (doc_counter_[doc_id] == 0) {
@@ -249,7 +252,11 @@ class EpsilonSearchStopCondition : public BaseSearchStopCondition<dist_t> {
 
  public:
     EpsilonSearchStopCondition(float epsilon, size_t min_num_candidates, size_t max_num_candidates) {
-        assert(min_num_candidates <= max_num_candidates);
+        if (min_num_candidates > max_num_candidates) {
+            throw std::runtime_error("Assertion failed: min_num_candidates <= max_num_candidates. min_num_candidates: " +
+                                     std::to_string(min_num_candidates) + ", max_num_candidates: " +
+                                     std::to_string(max_num_candidates));
+        }
         epsilon_ = epsilon;
         min_num_candidates_ = min_num_candidates;
         max_num_candidates_ = max_num_candidates;

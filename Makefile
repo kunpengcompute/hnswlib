@@ -3,8 +3,8 @@ ARCH := $(shell uname -m)
 CXX = g++
 LDFLAGS = -lhdf5_cpp -lhdf5
 SRCS = src/config_parser.cpp src/datasets.cpp src/test_result.cpp src/main.cpp
-ROOT = /home/lzy/hnswlib/kp/hnswlib
-HNSWLIBROOT = /home/lzy/hnswlib/kp/hnswlib/hnswlib/
+ROOT = ../
+HNSWLIBROOT = ../hnswlib/
 CXXFLAGS = -std=c++17 -fPIC -Ofast -Iinclude -I${ROOT}/include -fopenmp
 
 ifeq ($(ARCH),aarch64)

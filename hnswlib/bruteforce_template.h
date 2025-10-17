@@ -20,7 +20,6 @@
 #include <fstream>
 #include <mutex>
 #include <algorithm>
-#include <assert.h>
 #include "hnswlib.h"
 
 // 确保float16_t类型定义
@@ -137,7 +136,11 @@ public:
 
     std::priority_queue<std::pair<PriorityType<T>, labeltype>>
     searchKnn(const void *query_data, size_t k, BaseFilterFunctor* isIdAllowed = nullptr) const override {
-        assert(k <= cur_element_count_);
+        if (k > cur_element_count_) {
+            throw std::runtime_error("Assertion failed: k <= cur_element_count_. k: " +
+                                     std::to_string(k) + ", cur_element_count_: " +
+                                     std::to_string(cur_element_count_));
+        }
         std::priority_queue<std::pair<PriorityType<T>, labeltype>> topResults;
         if (cur_element_count_ == 0) return topResults;
         for (int i = 0; i < k; i++) {

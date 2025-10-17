@@ -29,7 +29,6 @@ void HNSWLIBIndex::build(const Datasets *data)
     index = std::make_unique<HierarchicalNSWHalf>(space.get(), data->nb, k_f, efc);
     if (save_or_load == "load") {
 		index->loadIndex(index_path.c_str(), space.get());
-        index->AggressiveRenumberInplace(true, true);
 	} else {
 	#pragma omp parallel for
 		for (size_t i = 0; i < data->nb; i++) {
@@ -89,7 +88,6 @@ void HNSWLIBIndex::build(const Datasets *data)
     index = std::make_unique<HierarchicalNSWFloat>(space.get(), data->nb, k_f, efc);
     if (save_or_load == "load") {
 		index->loadIndex(index_path.c_str(), space.get());
-        index->AggressiveRenumberInplace(true, true);
 	} else {
 	#pragma omp parallel for
 		for (size_t i = 0; i < data->nb; i++) {

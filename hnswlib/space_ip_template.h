@@ -24,6 +24,8 @@
 #include <random>
 #include <memory>
 #include <cstring>
+#include <arm_sve.h>
+#include <arm_neon.h>
 #include "hnswlib.h"
 
 #if !defined(__ARM_FEATURE_FP16_SCALAR_ARITHMETIC) && !defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC)
@@ -49,8 +51,6 @@ static float InnerProductTemplate(const void *pVect1v, const void *pVect2v, cons
 }
 
 #if defined(USE_SVE)
-#include <arm_sve.h>
-
 template<typename T>
 static float InnerProductSIMD16ExtTemplate(const void *pVect1v, const void *pVect2v, const void *qty_ptr) {
     T *pVect1 = (T *)pVect1v;
@@ -157,8 +157,6 @@ static float InnerProductSIMD4ExtResidualsTemplate(const void *pVect1v, const vo
 }
 
 #elif defined(USE_NEON)
-#include <arm_neon.h>
-
 template<typename T>
 static float InnerProductSIMD16ExtTemplate(const void *pVect1v, const void *pVect2v, const void *qty_ptr) {
     T *pVect1 = (T *)pVect1v;

@@ -23,7 +23,6 @@
 #include <atomic>
 #include <random>
 #include <stdlib.h>
-#include <assert.h>
 #include <unordered_set>
 #include <list>
 #include <memory>
@@ -631,9 +630,6 @@ public:
         return next_closest_entry_point;
     }
 
-    std::vector<tableint> debug_last_old2new_;  // old_id -> new_id
-    std::vector<tableint> debug_last_new2old_;  // new_id -> old_id
-    std::atomic<uint64_t> debug_renumber_epoch_{0};  // 重排次数
     void AggressiveRenumberInplace(bool place_deleted_last = true,
                                bool reorder_adj_by_newid = true) {
         std::lock_guard<std::mutex> guard(global);
@@ -693,11 +689,11 @@ public:
             old_of_new[newi] = old;
         }
 
-        // ---------- 3) 分配新 level-0 大块（64B 对齐） ----------
-        auto round_up_64 = [](size_t x){ return (x + 15) & ~size_t(15); };
+        // ---------- 3) 分配新 level-0 大块（16B 对齐） ----------
+        auto round_up_16 = [](size_t x){ return (x + 15) & ~size_t(15); };
         const size_t bytes = (size_t)max_elements_ * size_data_per_element_;
         void* newp = nullptr;
-        if (posix_memalign(&newp, 16, round_up_64(bytes)) != 0 || !newp)
+        if (posix_memalign(&newp, 16, round_up_16(bytes)) != 0 || !newp)
             throw std::runtime_error("posix_memalign failed in AggressiveRenumberInplace");
         char* new_mem = (char*)newp;
 
@@ -815,11 +811,6 @@ public:
             for (auto id : deleted_elements) if (id < N) new_deleted.insert(new_id[id]);
             deleted_elements.swap(new_deleted);
         }
-
-        // ---------- 12) 记录映射（用于调试打印/验证） ----------
-        debug_last_old2new_ = std::move(new_id);
-        debug_last_new2old_ = std::move(old_of_new);
-        debug_renumber_epoch_.fetch_add(1, std::memory_order_relaxed);
     }
 
     void resizeIndex(size_t new_max_elements) {
@@ -1008,6 +999,7 @@ public:
         }
 
         input.close();
+        AggressiveRenumberInplace(true, true);
 
         return;
     }
@@ -1048,7 +1040,11 @@ public:
     }
 
     void unmarkDeletedInternal(tableint internalId) {
-        assert(internalId < cur_element_count_);
+        if (internalId >= cur_element_count_) {
+            throw std::runtime_error("Assertion failed: internalId < cur_element_count_. internalId: " +
+                                     std::to_string(internalId) + ", cur_element_count_: " +
+                                     std::to_string(cur_element_count_));
+        }
         if (isMarkedDeleted(internalId)) {
             unsigned char *ll_cur = ((unsigned char*)get_linklist0(internalId)) + 2;
             *ll_cur &= ~DELETE_MARK;
@@ -1076,7 +1072,11 @@ public:
     }
 
     void markDeletedInternal(tableint internalId) {
-        assert(internalId < cur_element_count_);
+        if (internalId >= cur_element_count_) {
+            throw std::runtime_error("Assertion failed: internalId < cur_element_count_. internalId: " +
+                                     std::to_string(internalId) + ", cur_element_count_: " +
+                                     std::to_string(cur_element_count_));
+        }
         if (!isMarkedDeleted(internalId)) {
             unsigned char *ll_cur = ((unsigned char *)get_linklist0(internalId))+2;
             *ll_cur |= DELETE_MARK;
@@ -1508,19 +1508,34 @@ public:
                 tableint *data = (tableint *) (ll_cur + 1);
                 std::unordered_set<tableint> s;
                 for (int j = 0; j < size; j++) {
-                    assert(data[j] < cur_element_count_);
-                    assert(data[j] != i);
+                    if (data[j] >= cur_element_count_) {
+                        throw std::runtime_error("Assertion failed: data[j] < cur_element_count_. data[j]: " +
+                                                 std::to_string(data[j]) + ", cur_element_count_: " +
+                                                 std::to_string(cur_element_count_));
+                    }
+                    if (data[j] == i) {
+                        throw std::runtime_error("Assertion failed: data[j] != i. data[j]: " +
+                                                 std::to_string(data[j]) + ", i: " +
+                                                 std::to_string(i));
+                    }
                     inbound_connections_num[data[j]]++;
                     s.insert(data[j]);
                     connections_checked++;
                 }
-                assert(s.size() == size);
+                if (s.size() != size) {
+                    throw std::runtime_error("Assertion failed: s.size() == size. s.size(): " +
+                                             std::to_string(s.size()) + ", size: " +
+                                             std::to_string(size));
+                }
             }
         }
         if (cur_element_count_ > 1) {
             int min1 = inbound_connections_num[0], max1 = inbound_connections_num[0];
             for (int i=0; i < cur_element_count_; i++) {
-                assert(inbound_connections_num[i] > 0);
+                if (inbound_connections_num[i] <= 0) {
+                    throw std::runtime_error("Assertion failed: inbound_connections_num[i] > 0. inbound_connections_num[i]: " +
+                                             std::to_string(inbound_connections_num[i]));
+                }
                 min1 = std::min(inbound_connections_num[i], min1);
                 max1 = std::max(inbound_connections_num[i], max1);
             }

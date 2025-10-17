@@ -24,6 +24,8 @@
 #include <random>
 #include <memory>
 #include <cstring>
+#include <arm_sve.h>
+#include <arm_neon.h>
 #include "hnswlib.h"
 
 #if !defined(__ARM_FEATURE_FP16_SCALAR_ARITHMETIC) && !defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC)
@@ -54,8 +56,6 @@ static float L2SqrTemplate(const void *pVect1v, const void *pVect2v, const void 
 }
 
 #if defined(USE_SVE)
-#include <arm_sve.h>
-
 template<typename T>
 static float L2SqrSIMD16ExtTemplate(const void *pVect1v, const void *pVect2v, const void *qty_ptr) {
     T *pVect1 = (T *)pVect1v;
@@ -169,9 +169,6 @@ static float L2SqrSIMD4ExtResidualsTemplate(const void *pVect1v, const void *pVe
 }
 
 #elif defined(USE_NEON)
-
-#include <arm_neon.h>
-
 template<typename T>
 static float L2SqrSIMD16ExtTemplate(const void *pVect1v, const void *pVect2v, const void *qty_ptr) {
     T *pVect1 = (T *)pVect1v;

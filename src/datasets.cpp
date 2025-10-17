@@ -25,7 +25,11 @@ Datasets::Datasets(const std::string &_p, const std::string &_name, size_t _k, b
     xq = hdf5_read_floats(&file, p, &nq, &d2);
     
     // 检查维度一致性
-    assert(d == d2 && "Train and test vectors dimension mismatch!");
+    if (d != d2) {
+        throw std::runtime_error("Train and test vectors dimension mismatch! d: " +
+                                 std::to_string(d) + ", d2: " +
+                                 std::to_string(d2));
+    }
 
     // 读取ground truth
     size_t k, nq2;
@@ -33,8 +37,16 @@ Datasets::Datasets(const std::string &_p, const std::string &_name, size_t _k, b
     int64_t* gt_int = hdf5_read_ints(&file, p, &k, &nq2);
     
     // 检查数据集大小一致性
-    assert(nq == nq2 && "Query set size mismatch in ground truth");
-    assert(k >= topk && "Ground truth has fewer neighbors than required");
+    if (nq != nq2) {
+        throw std::runtime_error("Query set size mismatch in ground truth. nq: " +
+                                 std::to_string(nq) + ", nq2: " +
+                                 std::to_string(nq2));
+    }
+    if (k < topk) {
+        throw std::runtime_error("Ground truth has fewer neighbors than required. k: " +
+                                 std::to_string(k) + ", topk: " +
+                                 std::to_string(topk));
+    }
     
     // 复制所需topk个邻居
     gt = new int64_t[topk * nq];
