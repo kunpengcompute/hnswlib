@@ -578,7 +578,7 @@ bool run_end_to_end_test(const TestConfig& config) {
 		index->saveIndex(index_file);
     } catch (const std::exception& e) {
         std::cerr << "Failed to save index: " << e.what() << std::endl;
-        return;
+        index = nullptr;
     }
     end = chrono::high_resolution_clock::now();
     auto save_time = chrono::duration_cast<chrono::milliseconds>(end - start).count();

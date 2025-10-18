@@ -43,7 +43,7 @@ void HNSWLIBIndex::build(const Datasets *data)
 			    index->saveIndex(index_path.c_str());
             } catch (const std::exception& e) {
                 std::cerr << "Failed to save index: " << e.what() << std::endl;
-                return;
+                index = nullptr;
             }
 		}
 	}
@@ -107,7 +107,7 @@ void HNSWLIBIndex::build(const Datasets *data)
 			    index->saveIndex(index_path.c_str());
             } catch (const std::exception& e) {
                 std::cerr << "Failed to save index: " << e.what() << std::endl;
-                return;
+                index = nullptr;
             }
 		}
 	}

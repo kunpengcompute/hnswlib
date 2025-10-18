@@ -353,7 +353,7 @@ void sift_test1B() {
 		    appr_alg->saveIndex(path_index);
         } catch (const std::exception& e) {
             std::cerr << "Failed to save index: " << e.what() << std::endl;
-            return;
+            appr_alg = nullptr;
         }
     }
 
