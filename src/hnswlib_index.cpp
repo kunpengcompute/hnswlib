@@ -1,4 +1,6 @@
 #include "hnswlib_index.h"
+#include <omp.h>
+#include <filesystem>
 
 HNSWLIBIndex::HNSWLIBIndex(const ConfigParser &config)
 {
@@ -22,10 +24,26 @@ void HNSWLIBIndex::build(const Datasets *data)
         space = std::make_unique<L2Space>(dim);
     }
 	index = std::make_unique<HierarchicalNSW<float>>(space.get(), data->nb, k_f, efc);
-    #pragma omp parallel for
-    for (size_t i = 0; i < data->nb; i++) {
-        index->addPoint(data->xb + i * data->d, i);
-    }
+    if (save_or_load == "load") {
+		index->loadIndex(index_path.c_str(), space.get());
+	} else {
+	#pragma omp parallel for
+		for (size_t i = 0; i < data->nb; i++) {
+			index->addPoint(data->xb + i * data->d, i);
+		}
+		if (save_or_load == "save") {
+			std::filesystem::path dir_path = std::filesystem::path(index_path).parent_path();
+			if (!dir_path.empty() && !std::filesystem::exists(dir_path)) {
+                std::filesystem::create_directories(dir_path);
+            }
+			try{
+			    index->saveIndex(index_path.c_str());
+            } catch (const std::exception& e) {
+                std::cerr << "Failed to save index: " << e.what() << std::endl;
+                index = nullptr;
+            }
+		}
+	}
 }
 
 void HNSWLIBIndex::prepare_search()
