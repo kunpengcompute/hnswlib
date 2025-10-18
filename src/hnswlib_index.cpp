@@ -8,6 +8,8 @@ HNSWLIBIndex::HNSWLIBIndex(const ConfigParser &config)
     efs = config.get_int("efs", 100);
     efc = config.get_int("efc", 200);
     metric_str = config.get_string("metric", "L2");
+    index_path = config.get_string("index_path", "index.hnswlib");
+    save_or_load = config.get_string("save_or_load", "neither");
 }
 
 HNSWLIBIndex::~HNSWLIBIndex()
