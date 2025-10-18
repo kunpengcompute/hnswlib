@@ -574,7 +574,12 @@ bool run_end_to_end_test(const TestConfig& config) {
     string index_file = "test_index_" + config.distance_type + "_" + config.data_type + ".bin";
     
     start = chrono::high_resolution_clock::now();
-    index->saveIndex(index_file);
+    try{
+		index->saveIndex(index_file);
+    } catch (const std::exception& e) {
+        std::cerr << "Failed to save index: " << e.what() << std::endl;
+        return;
+    }
     end = chrono::high_resolution_clock::now();
     auto save_time = chrono::duration_cast<chrono::milliseconds>(end - start).count();
     cout << "   保存时间: " << save_time << " ms" << endl;
