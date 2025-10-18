@@ -22,6 +22,7 @@ void HNSWLIBIndex::build(const Datasets *data)
         space = std::make_unique<L2Space>(dim);
     }
 	index = std::make_unique<HierarchicalNSW<float>>(space.get(), data->nb, k_f, efc);
+    #pragma omp parallel for
     for (size_t i = 0; i < data->nb; i++) {
         index->addPoint(data->xb + i * data->d, i);
     }

@@ -349,7 +349,12 @@ void sift_test1B() {
         }
         input.close();
         cout << "Build time:" << 1e-6 * stopw_full.getElapsedTimeMicro() << "  seconds\n";
-        appr_alg->saveIndex(path_index);
+        try{
+		    appr_alg->saveIndex(path_index);
+        } catch (const std::exception& e) {
+            std::cerr << "Failed to save index: " << e.what() << std::endl;
+            appr_alg = nullptr;
+        }
     }
 
 

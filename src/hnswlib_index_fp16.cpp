@@ -39,7 +39,12 @@ void HNSWLIBIndex::build(const Datasets *data)
 			if (!dir_path.empty() && !std::filesystem::exists(dir_path)) {
                 std::filesystem::create_directories(dir_path);
             }
-			index->saveIndex(index_path.c_str());
+            try{
+			    index->saveIndex(index_path.c_str());
+            } catch (const std::exception& e) {
+                std::cerr << "Failed to save index: " << e.what() << std::endl;
+                index = nullptr;
+            }
 		}
 	}
 }
@@ -98,7 +103,12 @@ void HNSWLIBIndex::build(const Datasets *data)
 			if (!dir_path.empty() && !std::filesystem::exists(dir_path)) {
                 std::filesystem::create_directories(dir_path);
             }
-			index->saveIndex(index_path.c_str());
+			try{
+			    index->saveIndex(index_path.c_str());
+            } catch (const std::exception& e) {
+                std::cerr << "Failed to save index: " << e.what() << std::endl;
+                index = nullptr;
+            }
 		}
 	}
 }
