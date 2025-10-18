@@ -36,7 +36,7 @@ else ifeq ($(MAKECMDGOALS), hnswlib_fp16_neon_test)
 	DEFINES = -DHNSWLIB_FP16_TEST
 	CXXFLAGS += -I${HNSWLIBROOT} -DHNSWLIB_ENABLE_FP16 -DUSE_NEON -DHNSWLIB_USE_ARM
 	SRCS += src/hnswlib_index_fp16.cpp
-else ifeq ($(MAKECMDGOALS), hnswlib__test)
+else ifeq ($(MAKECMDGOALS), hnswlib_test)
 	TARGET = hnswlib_test
 	DEFINES = -DHNSWLIB_TEST
 	CXXFLAGS += -I${HNSWLIBROOT}
