@@ -56,7 +56,7 @@
 1.  获取源码。
 
     ```
-    git clone -b v？https://gitcode.com/boostkit/hnswlib.git
+    git clone -b v1.0.0 https://gitcode.com/boostkit/hnswlib.git
     ```
 
 2.  安装GCC 12.3.1与GCC-C++ 12.3.1。
