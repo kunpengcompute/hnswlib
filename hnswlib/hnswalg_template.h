@@ -134,6 +134,9 @@ public:
         data_size_ = s->get_data_size();
         fstdistfunc_ = s->get_dist_func();
         dist_func_param_ = s->get_dist_func_param();
+        if ( M <= 1) {
+            throw std::runtime_error("The value of M must be greater than 1.");
+        }
         if ( M <= 10000 ) {
             M_ = M;
         } else {

@@ -125,6 +125,10 @@ public:
 
         dict_external_to_internal.erase(found);
 
+        if (cur_element_count_ == 0) {
+            return;
+        }
+
         size_t cur_c = found->second;
         labeltype label = *((labeltype*)(data_ + size_per_element_ * (cur_element_count_-1) + data_size_));
         dict_external_to_internal[label] = cur_c;
