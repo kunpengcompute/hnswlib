@@ -1,4 +1,4 @@
-#include "../../hnswlib/hnswlib.h"
+#include "hnswlib/hnswlib.h"
 
 
 #ifdef HNSWLIB_ENABLE_FP16

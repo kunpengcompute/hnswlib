@@ -1,5 +1,5 @@
 #include <assert.h>
-#include "../../hnswlib/hnswlib.h"
+#include "hnswlib/hnswlib.h"
 
 typedef unsigned int docidtype;
 typedef float dist_t;
