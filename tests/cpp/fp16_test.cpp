@@ -17,6 +17,7 @@
 #include "hnswlib/bruteforce_template.h"
 #include "hnswlib/hnswalg_template.h"
 #include "hnswlib/data_type_converter.h"
+#include "hnswlib/safe_memory.h"
 
 // 确保float16_t类型定义
 #if !defined(__ARM_FEATURE_FP16_SCALAR_ARITHMETIC) && !defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC)
@@ -30,6 +31,7 @@ typedef __fp16 float16_t;
 
 using namespace hnswlib;
 using namespace std;
+using namespace CheckAndMemcpy;
 
 // 测试配置
 struct TestConfig {
@@ -169,7 +171,7 @@ brute_force_search(const std::vector<T>& data, const T* query,
         char* raw = (char*)bf.data_;
         size_t offset = space->get_data_size();
         size_t label_val = 0;
-        memcpy(&label_val, raw + offset, sizeof(label_val));
+        CheckAndMemcpy(&label_val, sizeof(label_val), raw + offset, sizeof(label_val));
         std::cout << "[DEBUG] bf.data_第一个label: " << label_val << std::endl;
     }
     // Debug: 检查query内容
