@@ -31,7 +31,7 @@ typedef __fp16 float16_t;
 
 using namespace hnswlib;
 using namespace std;
-using namespace CheckAndMemcpy;
+using namespace SafeMemory;
 
 // 测试配置
 struct TestConfig {
