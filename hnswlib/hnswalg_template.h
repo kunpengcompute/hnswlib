@@ -318,8 +318,8 @@ public:
             for (size_t j = 0; j < size; j++) {
                 tableint candidate_id = *(datal + j);
 #if defined(USE_SVE) || defined(USE_NEON)
-            __builtin_prefetch((visited_array + *(datal + j + 1)), 0, 3);
-            __builtin_prefetch(getDataByInternalId(*(datal + j + 1)), 0, 3);
+                __builtin_prefetch((visited_array + *(datal + j + 1)), 0, 3);
+                __builtin_prefetch(getDataByInternalId(*(datal + j + 1)), 0, 3);
 #endif
                 if (visited_array[candidate_id] == visited_array_tag) continue;
                 visited_array[candidate_id] = visited_array_tag;
@@ -329,7 +329,7 @@ public:
                 if (top_candidates.size() < ef_construction_ || lowerBound > dist1) {
                     candidateSet.emplace(-dist1, candidate_id);
 #if defined(USE_SVE) || defined(USE_NEON)
-            __builtin_prefetch(getDataByInternalId(candidateSet.top().second), 0, 3);
+                    __builtin_prefetch(getDataByInternalId(candidateSet.top().second), 0, 3);
 #endif
                     if (!isMarkedDeleted(candidate_id))
                         top_candidates.emplace(dist1, candidate_id);
@@ -416,8 +416,8 @@ public:
             for (size_t j = 1; j <= size; j++) {
                 int candidate_id = *(data + j);
 #if defined(USE_SVE) || defined(USE_NEON)
-            __builtin_prefetch((visited_array + *(data + j + 1)), 0, 3);
-            __builtin_prefetch(data_level0_memory_ + (*(data + j + 1)) * size_data_per_element_ + offsetData_, 0, 3);
+                __builtin_prefetch((visited_array + *(data + j + 1)), 0, 3);
+                __builtin_prefetch(data_level0_memory_ + (*(data + j + 1)) * size_data_per_element_ + offsetData_, 0, 3);
 #endif
                 if (!(visited_array[candidate_id] == visited_array_tag)) {
                     visited_array[candidate_id] = visited_array_tag;
@@ -435,8 +435,8 @@ public:
                     if (flag_consider_candidate) {
                         candidate_set.emplace(-dist, candidate_id);
 #if defined(USE_SVE) || defined(USE_NEON)
-            __builtin_prefetch(data_level0_memory_ + candidate_set.top().second * size_data_per_element_ + 
-                               offsetLevel0_, 0, 3);
+                        __builtin_prefetch(data_level0_memory_ + candidate_set.top().second * size_data_per_element_ + 
+                                           offsetLevel0_, 0, 3);
 #endif
                         if (bare_bone_search || 
                             (!isMarkedDeleted(candidate_id) && ((!isIdAllowed) || (*isIdAllowed)(getExternalLabel(candidate_id))))) {
