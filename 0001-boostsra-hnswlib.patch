@@ -4476,7 +4476,7 @@ diff -ruN '--exclude=.git' hnswlib/hnswlib/safe_memory.h k_hnswlib/hnswlib/safe_
 +                  << srcBufferSize << "].\n";
 +        return -1;
 +    }
-+    if (dest == nullptr || src == nullptr) {
++    if (dest == nullptr || (src == nullptr && srcBufferSize != 0)) {
 +        std::cerr << "Memcpy failed: null pointer detected\n";
 +        return -1;
 +    }
@@ -4491,7 +4491,7 @@ diff -ruN '--exclude=.git' hnswlib/hnswlib/safe_memory.h k_hnswlib/hnswlib/safe_
 +                  << "].\n";
 +        return -1;
 +    }
-+    if (dest == nullptr) {
++    if (dest == nullptr && setSize != 0) {
 +        std::cerr << "Memset failed: null pointer detected\n";
 +        return -1;
 +    }
