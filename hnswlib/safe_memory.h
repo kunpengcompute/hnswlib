@@ -28,7 +28,7 @@ int CheckAndMemcpy(D *dest, size_t destBufferSize, const S *src, size_t srcBuffe
                   << srcBufferSize << "].\n";
         return -1;
     }
-    if (dest == nullptr || src == nullptr) {
+    if (dest == nullptr || (src == nullptr && srcBufferSize != 0)) {
         std::cerr << "Memcpy failed: null pointer detected\n";
         return -1;
     }
@@ -43,7 +43,7 @@ int CheckAndMemset(D *dest, size_t destBufferSize, int memsetValue, size_t setSi
                   << "].\n";
         return -1;
     }
-    if (dest == nullptr) {
+    if (dest == nullptr && setSize != 0) {
         std::cerr << "Memset failed: null pointer detected\n";
         return -1;
     }
