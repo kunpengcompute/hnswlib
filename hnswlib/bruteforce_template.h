@@ -21,6 +21,7 @@
 #include <mutex>
 #include <algorithm>
 #include "hnswlib.h"
+#include "safe_memory.h"
 
 // 确保float16_t类型定义
 #if !defined(__ARM_FEATURE_FP16_SCALAR_ARITHMETIC) && !defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC)
@@ -31,6 +32,8 @@ typedef __fp16 float16_t;
 typedef __fp16 float16_t;
 #endif
 #endif
+
+using namespace SafeMemory;
 
 namespace hnswlib {
 
@@ -111,8 +114,8 @@ public:
                 cur_element_count_++;
             }
         }
-        memcpy(data_ + size_per_element_ * idx + data_size_, &label, sizeof(labeltype));
-        memcpy(data_ + size_per_element_ * idx, datapoint, data_size_);
+        CheckAndMemcpy(data_ + size_per_element_ * idx + data_size_, sizeof(labeltype), &label, sizeof(labeltype));
+        CheckAndMemcpy(data_ + size_per_element_ * idx, data_size_, datapoint, data_size_);
     }
 
     void removePoint(labeltype cur_external) {
@@ -125,12 +128,17 @@ public:
 
         dict_external_to_internal.erase(found);
 
+        if (cur_element_count_ == 0) {
+            return;
+        }
+
         size_t cur_c = found->second;
         labeltype label = *((labeltype*)(data_ + size_per_element_ * (cur_element_count_-1) + data_size_));
         dict_external_to_internal[label] = cur_c;
-        memcpy(data_ + size_per_element_ * cur_c,
-               data_ + size_per_element_ * (cur_element_count_-1),
-               data_size_+sizeof(labeltype));
+        CheckAndMemcpy(data_ + size_per_element_ * cur_c,
+                       data_size_+sizeof(labeltype),
+                       data_ + size_per_element_ * (cur_element_count_-1),
+                       data_size_+sizeof(labeltype));
         cur_element_count_--;
     }
 

@@ -60,7 +60,6 @@ public:
         size_t dim
     ) {
         if (data_type == "fp32" || data_type == "FP32" || data_type == "float") {
-            // return reinterpret_cast<SpaceInterface<float>*>(createSpace<float>(distance_type,dim));
             return createSpace<float>(distance_type, dim);
         } else if (data_type == "fp16" || data_type == "FP16" || data_type == "half") {
             // 注意：此处返回类型为SpaceInterface<float>*，但实际对象为SpaceInterface<float16_t>*

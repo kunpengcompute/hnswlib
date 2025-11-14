@@ -2,7 +2,7 @@
 
 Creating index, inserting elements, searching and serialization
 ```cpp
-#include "../../hnswlib/hnswlib.h"
+#include "hnswlib/hnswlib.h"
 
 
 int main() {
@@ -96,7 +96,7 @@ int main() {
 
 An example of filtering with a boolean function during the search:
 ```cpp
-#include "../../hnswlib/hnswlib.h"
+#include "hnswlib/hnswlib.h"
 
 
 // Filter that allows labels divisible by divisor
@@ -179,7 +179,7 @@ int main() {
 
 An example with reusing the memory of the deleted elements when new elements are being added (via `allow_replace_deleted` flag):
 ```cpp
-#include "../../hnswlib/hnswlib.h"
+#include "hnswlib/hnswlib.h"
 
 
 int main() {

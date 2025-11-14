@@ -21,11 +21,17 @@ public:
     }
 
     static void convert_fp32_to_fp16(const float* src, float16_t* dst, size_t count) {
+        if (count <= 0) {
+            throw std::runtime_error("convert_fp32_to_fp16 failed : count <= 0");
+        }
         for (size_t i = 0; i < count; ++i) {
             dst[i] = float_to_fp16(src[i]);
         }
     }
     static void convert_fp16_to_fp32(const float16_t* src, float* dst, size_t count) {
+        if (count <= 0) {
+            throw std::runtime_error("convert_fp16_to_fp32 failed : count <= 0");
+        }
         for (size_t i = 0; i < count; ++i) {
             dst[i] = fp16_to_float(src[i]);
         }
