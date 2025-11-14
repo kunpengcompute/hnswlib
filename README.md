@@ -63,23 +63,17 @@
 2.  下载hnswlib的patch文件，假设安装路径为“/path/to“。
 
     ```
-    git clone https://gitcode.com/boostkit/hnswlib.git k_hnswlib
+    git clone -b v1.0.0 https://gitcode.com/boostkit/hnswlib.git k_hnswlib
     ```
 
-3.  检查patch是否可应用于开源代码。如果执行下述命令不产生任何报错则可应用patch。
+3.  应用patch。
 
     ```
     cd hnswlib
-    git apply --check ../k_hnswlib/0001-boostsra-hnswlib.patch
+    patch -p1 < ../k_hnswlib/0001-boostsra-hnswlib.patch
     ```
 
-4.  应用patch。
-
-    ```
-    git apply  ../k_hnswlib/0001-boostsra-hnswlib.patch
-    ```
-
-5.  安装GCC 12.3.1与GCC-C++ 12.3.1。
+4.  安装GCC 12.3.1与GCC-C++ 12.3.1。
 
     ```
     yum install gcc-toolset-12-gcc gcc-toolset-12-gcc-c++
@@ -87,19 +81,19 @@
     export LD_LIBRARY_PATH=/opt/openEuler/gcc-toolset-12/root/usr/lib64/:$LD_LIBRARY_PATH
     ```
 
-6.  安装OpenMP、CMake、Make。
+5.  安装OpenMP、CMake、Make。
 
     ```
     yum install cmake libgomp make
     ```
 
-7.  安装HDF5库。
+6.  安装HDF5库。
 
     ```
     yum install hdf5-devel
     ```
 
-8.  编译源码。假设源码存放于“/path/to/hnswlib“目录下。
+7.  编译源码。假设源码存放于“/path/to/hnswlib“目录下。
 
     ```
     cd /path/to/hnswlib
