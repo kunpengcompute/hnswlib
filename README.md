@@ -51,26 +51,26 @@
 </tbody>
 </table>
 
-## 源码编译<a name="ZH-CN_TOPIC_0000002476751032"></a>
+## 源码获取<a name="ZH-CN_TOPIC_0000002476751032"></a>
 
-1.  获取开源代码，假设安装路径为“/path/to“。
+1.  获取开源代码，假设安装路径为"/path/to"。
 
     ```
     cd /path/to
-    git clone https://github.com/nmslib/hnswlib.git
+    git clone -b v0.8.0 https://github.com/nmslib/hnswlib.git
     ```
 
-2.  下载hnswlib的patch文件，假设安装路径为“/path/to“。
+2.  下载hnswlib的patch文件，假设安装路径为"/path/to"。
 
     ```
-    git clone -b v1.0.0 https://gitcode.com/boostkit/hnswlib.git k_hnswlib
+    git clone https://gitcode.com/boostkit/hnswlib.git hnswlib-patch
     ```
 
 3.  应用patch。
 
     ```
     cd hnswlib
-    patch -p1 < ../k_hnswlib/0001-boostsra-hnswlib.patch
+    patch -p1 < ../hnswlib-patch/0001-hnswlib_0.8.0-optimize-fp32_fp16_dis_idsort_prefetch.patch
     ```
 
 4.  安装GCC 12.3.1与GCC-C++ 12.3.1。
@@ -93,22 +93,6 @@
     yum install hdf5-devel
     ```
 
-7.  编译源码。假设源码存放于“/path/to/hnswlib“目录下。
-
-    ```
-    cd /path/to/hnswlib
-    make hnswlib_neon_test
-    make hnswlib_sve_test
-    make hnswlib_fp16_neon_test
-    make hnswlib_fp16_sve_test
-    ```
-
-    >![](public_sys-resources/icon-note.gif) **说明：** 
-    >编译选项说明：
-    >-   hnswlib\_neon\_test：fp32数据类型使用neon向量化指令。
-    >-   hnswlib\_sve\_test：fp32数据类型使用sve向量化指令。
-    >-   hnswlib\_fp16\_neon\_test：fp16数据类型使用neon向量化指令。
-    >-   hnswlib\_fp16\_sve\_test：fp16数据类型使用sve向量化指令。
 
 # 快速上手<a name="ZH-CN_TOPIC_0000002508580607"></a>
 
@@ -119,17 +103,13 @@
 
 **目录说明<a name="section20169143153012"></a>**
 
-假设程序运行的目录为“"/path/to/hnswlib"“，完整的目录结构应如下所示：
+假设程序运行的目录为"/path/to/hnswlib"，完整的目录结构应如下所示：
 
 ```
-├── configs            // 数据集相关配置文件
+├── examples           // 功能测试文件
 ├── hnswlib            // hnswlib头文件
 ├── python_bindings    // python接口文件
-├── include            // 性能测试文件
-├── src                // 性能测试头文件
-├── examples           // 功能测试文件
 ├── tests              // 功能测试文件
-├── test               // 测试文件，包含ut测试和fuzz测试
 └── ALGO_PARAMS.md
 └── CMakeLists.txt     // 功能测试CMakeLists.txt文件
 └── LICENSE
@@ -137,8 +117,6 @@
 └── MANIFEST.in
 └── pyproject.toml
 └── README.md
-└── run.sh             // 编译并执行功能测试的脚本
-└── test.sh            // 执行性能测试的脚本
 └── setup.py
 └── TESTING_RECALL.md
 ```
@@ -147,39 +125,65 @@
 
 下方使用示例以使用fashion-mnist-784-euclidean.hdf5数据集为例。
 
-1.  创建data文件夹，并将数据集加入data文件夹中。
+1.  获取测试程序。假设路径为"/path/to/sra_test"。
 
     ```
-    cd /path/to/hnswlib
+    git clone https://gitcode.com/openeuler/sra_test.git
+    ```
+
+2.  创建data文件夹，获取测试数据集。
+    ```
+    cd /path/to/sra_test
     mkdir data && cd data
     wget http://ann-benchmarks.com/fashion-mnist-784-euclidean.hdf5 --no-check-certificate
     ```
 
-2.  为脚本添加运行权限。
+3.  编译可执行文件。
+    ```
+    make hnswlib_test          // fp32数据类型，使用neon向量化指令。
+    make hnswlib_fp16_test     // fp16数据类型，使用neon向量化指令。
+    ```
+    完整的目录结构如下所示。
+    ```
+    ├── configs                                                   // 存放对应算法、对应数据集配置文件
+          └── hnswlib_fp16
+                └── hnswlib_fp16_fashion-mnist-784-euclidean.config
+    ├── data                                                      // 存放数据集
+          └── fashion-mnist-784-euclidean.hdf5
+    ├── include                                                   // 存放测试框架对应的头文件
+    ├── indexes
+          └── hnswlib_fp16                                        // 存放构建好的索引，需手动创建。
+                └── fashion.hnswlib                               // 构建好的索引，运行可执行文件hnswlib_fp16_test后（对应数据集配置文件“save_or_load”为save）时生成
+    ├── scripts
+          └── build.sh                                            // 脚本文件
+    ├── src                                                       // 存放测试框架对应的源文件
+    └── get_result.py
+    └── LICENSE
+    └── Makefile
+    └── README.md
+    └── test.sh                                                   // 执行性能测试的脚本
+    └── test_multi-numas.sh                                       // 执行多numa性能测试的脚本
+    └── hnswlib_fp16_test                                         // 编译后生成的可执行文件
+    └── hnswlib_test
+    
+    ```
+
+4.  运行测试脚本。
 
     ```
-    cd /path/to/hnswlib
-    chmod +x test.sh
-    ```
-
-3.  运行测试脚本。
-
-    ```
-    ./test.sh hnswlib hnswlib_neon               // fp32数据类型，使用neon指令
-    ./test.sh hnswlib hnswlib_sve                // fp32数据类型，使用sve指令
-    ./test.sh hnswlib_fp16 hnswlib_fp16_neon     // fp16数据类型，使用neon指令
-    ./test.sh hnswlib_fp16 hnswlib_fp16_sve      // fp16数据类型，使用sve指令
+    sh test.sh hnswlib                // fp32数据类型，使用neon向量化指令。
+    sh test.sh hnswlib_fp16           // fp16数据类型，使用neon向量化指令。
     ```
 
     测试结果存在output文件夹中，关注测试结果的qps指标，并且召回率大于0.99。
 
     >![](public_sys-resources/icon-note.gif) **说明：** 
-    >-   “/path/to/hnswlib/configs“文件夹下包含了不同数据集的配置信息，其中，index\_path是索引保存路径，save\_or\_load是图索引构建或加载选项。
-    >-   当save\_or\_load选项为save时表示构图模式，此时会将构建的图索引保存到“/path/to/hnswlib/index\_path“中。
-    >-   当save\_or\_load选项为load时表示加载模式，此时会从“/path/to/hnswlib/index\_path“中加载图索引，直接用于后续的搜索。
+    >-   "/configs"文件夹下包含了不同数据集的配置信息，其中，index\_path是索引保存路径，save\_or\_load是图索引构建或加载选项。
+    >-   当save\_or\_load选项为save时表示构图模式，此时会将构建的图索引保存到"/index\_path"中。
+    >-   当save\_or\_load选项为load时表示加载模式，此时会从"/index\_path"中加载图索引，直接用于后续的搜索。
     >-   首次运行时，在save模式和单NUMA的情况下运行性能测试脚本文件，保存图索引。
-    >-   在后续运行中，如果不需要修改k\_f、efs、efc的值，则可以在load模式和整机4numa下运行脚本获取性能数据。
-    >-   如果需要修改k\_f、efs、efc的值，则需要在save模式下重新构图。
+    >-   在后续运行中，如果不需要修改k\_f、efc的值，则可以在load模式和整机4numa下运行脚本获取性能数据。
+    >-   如果需要修改k\_f、efc的值，则需要在save模式下重新构图。
 
 **性能测试参数调优指导<a name="section3966431183112"></a>**
 
@@ -253,21 +257,27 @@ index_path = indexes/hnsw/fashion.faiss
 
 执行下方指令，用于看护编译及运行环境是否正常，算法功能是否正确。
 
-```
-cd /path/to/hnswlib/test/ut_test
-chmod +x run.sh
-sh run.sh
-```
+1.  创建UT测试运行脚本。
+    ```
+    cd /path/to/hnswlib
+    vim run.sh
+    ```
+    run.sh脚本内容如下：
+    ```
+    rm -rf build
+    mkdir build
+    cd build
+    cmake ..
+    make
 
-## 功能测试（可选）<a name="ZH-CN_TOPIC_0000002476594158"></a>
+    ./distance_calculation_neon_test
+    ```
+    粘贴上述内容至脚本后，按ESC，输入":wq"后回车，保存文件并退出。
 
-执行下方指令，用于看护算法功能是否正确。
-
-```
-cd /path/to/hnswlib
-chmod +x run.sh
-sh run.sh
-```
+2.  运行UT测试。
+    ```
+    sh run.sh
+    ```
 
 # 贡献指南<a name="ZH-CN_TOPIC_0000002508700579"></a>
 
