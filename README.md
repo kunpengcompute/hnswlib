@@ -8,6 +8,9 @@
 | 补丁文件 |  功能 |
 | ------------ | ------------ |
 | 0001-boostsra-hnswlib-0.8.0-optimize_dis.patch  | 面向AArch64平台的汇编优化，加速L2/IP距离计算。  |
+| 0001-hnswlib_0.8.0-optimize-fp32_dis.patch  | 面向AArch64平台的汇编优化，使用NEON向量化指令加速FP32的L2/IP距离计算。  |
+| 0002-hnswlib_0.8.0-optimize-idsort_prefetch.patch  | 面向AArch64平台的汇编优化，提供预取和底库ID重排优化。  |
+| 0003-hnswlib_0.8.0-optimize-fp32_fp16_dis.patch  | 面向AArch64平台的汇编优化，使用NEON向量化指令加速FP32和FP16的L2/IP距离计算。  |
 
 
 ## 使用补丁文件
