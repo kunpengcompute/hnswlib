@@ -1,0 +1,466 @@
+diff -Naur '--exclude=.git' '--exclude=.vscode' hnswlib/README.md hnswlib-patch/README.md
+--- hnswlib/README.md	2026-02-10 15:26:22.848672600 +0800
++++ hnswlib-patch/README.md	2026-02-10 16:07:53.290314500 +0800
+@@ -25,8 +25,8 @@
+ ### Highlights:
+ 1) Lightweight, header-only, no dependencies other than C++ 11
+ 2) Interfaces for C++, Python, external support for Java and R (https://github.com/jlmelville/rcpphnsw).
+-3) Has full support for incremental index construction and updating the elements. Has support for element deletions 
+-(by marking them in index). Index is picklable.
++3) Has full support for incremental index construction and updating the elements (thanks to the contribution by Apoorv Sharma). Has support for element deletions 
++(by marking them in index, later can be replaced with other elements). Python index is picklable.
+ 4) Can work with custom user defined distances (C++).
+ 5) Significantly less memory footprint and faster build time compared to current nmslib's implementation.
+ 
+diff -Naur '--exclude=.git' '--exclude=.vscode' hnswlib/hnswlib/hnswalg.h hnswlib-patch/hnswlib/hnswalg.h
+--- hnswlib/hnswlib/hnswalg.h	2026-02-10 15:26:22.858671900 +0800
++++ hnswlib-patch/hnswlib/hnswalg.h	2026-02-12 11:04:14.774286200 +0800
+@@ -1,7 +1,30 @@
++/*
++   Copyright 2026 Huawei Technologies Co., Ltd.
++  
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++  
++       http://www.apache.org/licenses/LICENSE-2.0
++  
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++ */
++
++/**
++ * Modifications:
++ * - 2026 BoostKit: Prefetching and aggressive renumber inplace is supported
++ * on the ARM platform.
++ */
++
+ #pragma once
+ 
+ #include "visited_list_pool.h"
+ #include "hnswlib.h"
++#include "safe_memory.h"
+ #include <atomic>
+ #include <random>
+ #include <stdlib.h>
+@@ -184,23 +207,30 @@
+ 
+     inline labeltype getExternalLabel(tableint internal_id) const {
+         labeltype return_label;
+-        memcpy(&return_label, (data_level0_memory_ + internal_id * size_data_per_element_ + label_offset_), sizeof(labeltype));
++        SafeMemory::CheckAndMemcpy(&return_label,
++                                   sizeof(labeltype),
++                                   data_level0_memory_ + (size_t)internal_id * size_data_per_element_ + label_offset_,
++                                   sizeof(labeltype));
+         return return_label;
+     }
+ 
+ 
+     inline void setExternalLabel(tableint internal_id, labeltype label) const {
+-        memcpy((data_level0_memory_ + internal_id * size_data_per_element_ + label_offset_), &label, sizeof(labeltype));
++        SafeMemory::CheckAndMemcpy((data_level0_memory_ + internal_id * size_data_per_element_ + label_offset_),
++                                   sizeof(labeltype),
++                                   &label,
++                                   sizeof(labeltype));
+     }
+ 
+ 
+     inline labeltype *getExternalLabeLp(tableint internal_id) const {
+-        return (labeltype *) (data_level0_memory_ + internal_id * size_data_per_element_ + label_offset_);
++        return reinterpret_cast<labeltype *>(
++            data_level0_memory_ + (size_t)internal_id * size_data_per_element_ + label_offset_);
+     }
+ 
+ 
+     inline char *getDataByInternalId(tableint internal_id) const {
+-        return (data_level0_memory_ + internal_id * size_data_per_element_ + offsetData_);
++        return data_level0_memory_ + (size_t)internal_id * size_data_per_element_ + offsetData_;
+     }
+ 
+ 
+@@ -268,6 +298,11 @@
+             _mm_prefetch((char *) (visited_array + *(data + 1) + 64), _MM_HINT_T0);
+             _mm_prefetch(getDataByInternalId(*datal), _MM_HINT_T0);
+             _mm_prefetch(getDataByInternalId(*(datal + 1)), _MM_HINT_T0);
++#elif defined(USE_NEON)
++            __builtin_prefetch((visited_array + *(data + 1)), 0, 3);
++            __builtin_prefetch((visited_array + *(data + 1) + 64), 0, 3);
++            __builtin_prefetch(getDataByInternalId(*datal), 0, 3);
++            __builtin_prefetch(getDataByInternalId(*(datal + 1)), 0, 3);
+ #endif
+ 
+             for (size_t j = 0; j < size; j++) {
+@@ -276,6 +311,9 @@
+ #ifdef USE_SSE
+                 _mm_prefetch((char *) (visited_array + *(datal + j + 1)), _MM_HINT_T0);
+                 _mm_prefetch(getDataByInternalId(*(datal + j + 1)), _MM_HINT_T0);
++#elif defined(USE_NEON)
++                __builtin_prefetch((visited_array + *(datal + j + 1)), 0, 3);
++                __builtin_prefetch(getDataByInternalId(*(datal + j + 1)), 0, 3);
+ #endif
+                 if (visited_array[candidate_id] == visited_array_tag) continue;
+                 visited_array[candidate_id] = visited_array_tag;
+@@ -286,6 +324,8 @@
+                     candidateSet.emplace(-dist1, candidate_id);
+ #ifdef USE_SSE
+                     _mm_prefetch(getDataByInternalId(candidateSet.top().second), _MM_HINT_T0);
++#elif defined(USE_NEON)
++                    __builtin_prefetch(getDataByInternalId(candidateSet.top().second), 0, 3);
+ #endif
+ 
+                     if (!isMarkedDeleted(candidate_id))
+@@ -372,6 +412,11 @@
+             _mm_prefetch((char *) (visited_array + *(data + 1) + 64), _MM_HINT_T0);
+             _mm_prefetch(data_level0_memory_ + (*(data + 1)) * size_data_per_element_ + offsetData_, _MM_HINT_T0);
+             _mm_prefetch((char *) (data + 2), _MM_HINT_T0);
++#elif defined(USE_NEON)
++            __builtin_prefetch((visited_array + *(data + 1)), 0, 3);
++            __builtin_prefetch((visited_array + *(data + 1) + 64), 0, 3);
++            __builtin_prefetch((data_level0_memory_ + (*(data + 1)) * size_data_per_element_ + offsetData_), 0, 3);
++            __builtin_prefetch((data + 2), 0, 3);
+ #endif
+ 
+             for (size_t j = 1; j <= size; j++) {
+@@ -381,6 +426,9 @@
+                 _mm_prefetch((char *) (visited_array + *(data + j + 1)), _MM_HINT_T0);
+                 _mm_prefetch(data_level0_memory_ + (*(data + j + 1)) * size_data_per_element_ + offsetData_,
+                                 _MM_HINT_T0);  ////////////
++#elif defined(USE_NEON)
++                __builtin_prefetch((visited_array + *(data + j + 1)), 0, 3);
++                __builtin_prefetch(data_level0_memory_ + (*(data + j + 1)) * size_data_per_element_ + offsetData_, 0, 3);
+ #endif
+                 if (!(visited_array[candidate_id] == visited_array_tag)) {
+                     visited_array[candidate_id] = visited_array_tag;
+@@ -401,6 +449,9 @@
+                         _mm_prefetch(data_level0_memory_ + candidate_set.top().second * size_data_per_element_ +
+                                         offsetLevel0_,  ///////////
+                                         _MM_HINT_T0);  ////////////////////////
++#elif defined(USE_NEON)
++                        __builtin_prefetch(data_level0_memory_ + candidate_set.top().second * size_data_per_element_ + 
++                                           offsetLevel0_, 0, 3);
+ #endif
+ 
+                         if (bare_bone_search || 
+@@ -482,9 +533,9 @@
+         }
+     }
+ 
+-
+-    linklistsizeint *get_linklist0(tableint internal_id) const {
+-        return (linklistsizeint *) (data_level0_memory_ + internal_id * size_data_per_element_ + offsetLevel0_);
++    inline linklistsizeint *get_linklist0(tableint internal_id) const {
++        return reinterpret_cast<linklistsizeint*>(
++            data_level0_memory_ + (size_t)internal_id * size_data_per_element_ + offsetLevel0_);
+     }
+ 
+ 
+@@ -497,10 +548,11 @@
+         return (linklistsizeint *) (linkLists_[internal_id] + (level - 1) * size_links_per_element_);
+     }
+ 
+-
+-    linklistsizeint *get_linklist_at_level(tableint internal_id, int level) const {
+-        return level == 0 ? get_linklist0(internal_id) : get_linklist(internal_id, level);
+-    }
++    inline linklistsizeint *get_linklist_at_level(tableint internal_id, int level) const {
++        return level == 0 ? get_linklist0(internal_id)
++                          : reinterpret_cast<linklistsizeint *>(
++                                  linkLists_[internal_id] + (size_t)(level - 1) * size_links_per_element_);
++	}
+ 
+ 
+     tableint mutuallyConnectNewElement(
+@@ -629,6 +681,224 @@
+         return next_closest_entry_point;
+     }
+ 
++#ifdef USE_NEON
++    void AggressiveRenumberInplace(bool place_deleted_last = true,
++                                   bool reorder_adj_by_newid = true) {
++        std::lock_guard<std::mutex> guard(global);
++
++        const tableint N = static_cast<tableint>(cur_element_count);
++        if (N == 0) {
++            return;
++        }
++
++        std::vector<char> is_active(N, 1);
++        {
++            std::unique_lock<std::mutex> lock_deleted(deleted_elements_lock);
++            for (tableint id : deleted_elements) {
++                if (id < N) {
++                    is_active[id] = 0;
++                }
++            }
++        }
++
++        std::vector<tableint> order;
++        order.reserve(N);
++        std::vector<char> vis(N, 0);
++
++        auto bfs_push = [&](tableint s) {
++            if (s >= N || vis[s]) return;
++            std::queue<tableint> q;
++            vis[s] = 1;
++            q.push(s);
++            while (!q.empty()) {
++                tableint u = q.front();
++                q.pop();
++                if (is_active[u]) {
++                    order.push_back(u);
++                }
++                linklistsizeint* ll = get_linklist_at_level(u, 0);
++                int deg = getListCount(ll);
++                tableint* nb = reinterpret_cast<tableint*>(ll + 1);
++                for (int i = 0; i < deg; ++i) {
++                    tableint v = nb[i];
++                    if (v < N && !vis[v]) {
++                        vis[v] = 1;
++                        q.push(v);
++                    }
++                }
++            }
++        };
++
++        tableint root = (enterpoint_node_ < N && enterpoint_node_ != static_cast<tableint>(-1))
++                        ? enterpoint_node_ : 0;
++        bfs_push(root);
++        for (tableint i = 0; i < N; ++i) {
++            bfs_push(i);
++        }
++
++        if (place_deleted_last) {
++            for (tableint i = 0; i < N; ++i) {
++                if (!is_active[i]) {
++                    order.push_back(i);
++                }
++            }
++        } else {
++            std::vector<char> seen(N, 0);
++            for (auto x : order) {
++                seen[x] = 1;
++            }
++            for (tableint i = 0; i < N; ++i) {
++                if (!seen[i]) {
++                    order.push_back(i);
++                }
++            }
++        }
++
++        std::vector<tableint> new_id(N);
++        std::vector<tableint> old_of_new(N);
++        for (tableint newi = 0; newi < N; ++newi) {
++            tableint old = order[newi];
++            new_id[old] = newi;
++            old_of_new[newi] = old;
++        }
++
++        auto round_up_16 = [](size_t x){ return (x + 15) & ~size_t(15); };
++        const size_t bytes = (size_t)max_elements_ * size_data_per_element_;
++        void* newp = nullptr;
++        if (posix_memalign(&newp, 16, round_up_16(bytes)) != 0 || !newp) {
++            throw std::runtime_error("posix_memalign failed in AggressiveRenumberInplace");
++        }
++        char* new_mem = (char*)newp;
++
++        #pragma omp parallel for schedule(static)
++        for (tableint newi = 0; newi < N; ++newi) {
++            tableint old = old_of_new[newi];
++            char* dst = new_mem + (size_t)newi * size_data_per_element_;
++            char* src = data_level0_memory_ + (size_t)old * size_data_per_element_;
++            SafeMemory::CheckAndMemcpy(dst, size_data_per_element_, src, size_data_per_element_);
++
++            linklistsizeint* ll = reinterpret_cast<linklistsizeint*>(dst + offsetLevel0_);
++            int deg = getListCount(ll);
++            tableint* nb = reinterpret_cast<tableint*>(ll + 1);
++            for (int j = 0; j < deg; ++j) {
++                tableint v = nb[j];
++                if (v < N) {
++                    nb[j] = new_id[v];
++                }
++            }
++            if (reorder_adj_by_newid && deg > 1) {
++                std::sort(nb, nb + deg);
++            }
++        }
++
++        if (N < max_elements_) {
++            memset(new_mem + (size_t)N * size_data_per_element_, 0,
++                   (size_t)(max_elements_ - N) * size_data_per_element_);
++        }
++
++        char** new_linkLists = (char**)malloc(sizeof(void*) * max_elements_);
++        if (!new_linkLists) {
++            free(new_mem);
++            throw std::runtime_error("OOM: new_linkLists");
++        }
++        #pragma omp parallel for schedule(static)
++        for (tableint i = 0; i < max_elements_; ++i) {
++            new_linkLists[i] = nullptr;
++        }
++
++        std::atomic<bool> oom(false);
++
++        #pragma omp parallel for schedule(static)
++        for (tableint newi = 0; newi < N; ++newi) {
++            tableint old = old_of_new[newi];
++            int level = element_levels_[old];
++            if (level > 0) {
++                char* buf = (char*)malloc(size_links_per_element_ * level + 1);
++                if (!buf) {
++                    oom.store(true, std::memory_order_relaxed);
++                    continue;
++                }
++                memset(buf, 0, size_links_per_element_ * level + 1);
++                new_linkLists[newi] = buf;
++
++                for (int l = 1; l <= level; ++l) {
++                    unsigned int* old_ll = get_linklist(old, l);
++                    int cnt = getListCount(old_ll);
++                    unsigned int* new_ll = reinterpret_cast<unsigned int*>(
++                        buf + (size_t)(l - 1) * size_links_per_element_);
++                    setListCount(new_ll, cnt);
++
++                    tableint* old_nb = (tableint*)(old_ll + 1);
++                    tableint* new_nb = (tableint*)(new_ll + 1);
++                    for (int k = 0; k < cnt; ++k) {
++                        tableint v = old_nb[k];
++                        new_nb[k] = (v < N) ? new_id[v] : v;
++                    }
++                    if (reorder_adj_by_newid && cnt > 1) {
++                        std::sort(new_nb, new_nb + cnt);
++                    }
++                }
++            }
++        }
++
++        if (oom.load(std::memory_order_relaxed)) {
++            for (tableint i = 0; i < N; ++i) {
++                if (new_linkLists[i]) {
++                    free(new_linkLists[i]);
++                }
++            }
++            free(new_linkLists);
++            free(new_mem);
++            throw std::runtime_error("OOM while rebuilding upper-level linklists");
++        }
++
++        for (tableint oldi = 0; oldi < N; ++oldi) {
++            if (element_levels_[oldi] > 0 && linkLists_[oldi]) {
++                free(linkLists_[oldi]);
++            }
++        }
++        free(linkLists_);
++        linkLists_ = new_linkLists;
++
++        free(data_level0_memory_);
++        data_level0_memory_ = new_mem;
++
++        std::vector<int> new_levels(max_elements_, 0);
++        for (tableint newi = 0; newi < N; ++newi) {
++            new_levels[newi] = element_levels_[old_of_new[newi]];
++        }
++        element_levels_.swap(new_levels);
++
++        if (enterpoint_node_ != static_cast<tableint>(-1)) {
++            enterpoint_node_ = new_id[enterpoint_node_];
++        }
++
++        {
++            std::unique_lock<std::mutex> lock(label_lookup_lock);
++            std::unordered_map<labeltype, tableint> new_map;
++            new_map.reserve(label_lookup_.size() * 2);
++            for (auto &kv : label_lookup_) {
++                tableint old = kv.second;
++                if (old < N) {
++                    new_map.emplace(kv.first, new_id[old]);
++                }
++            }
++            label_lookup_.swap(new_map);
++        }
++
++        {
++            std::unique_lock<std::mutex> lock(deleted_elements_lock);
++            std::unordered_set<tableint> new_deleted;
++            new_deleted.reserve(deleted_elements.size() * 2);
++            for (auto id : deleted_elements) {
++                if (id < N) {
++                    new_deleted.insert(new_id[id]);
++                }
++            }
++            deleted_elements.swap(new_deleted);
++        }
++    }
++#endif
+ 
+     void resizeIndex(size_t new_max_elements) {
+         if (new_max_elements < cur_element_count)
+@@ -817,6 +1087,9 @@
+         }
+ 
+         input.close();
++#ifdef USE_NEON
++        AggressiveRenumberInplace(true, true);
++#endif
+ 
+         return;
+     }
+@@ -1091,10 +1364,14 @@
+                     tableint *datal = (tableint *) (data + 1);
+ #ifdef USE_SSE
+                     _mm_prefetch(getDataByInternalId(*datal), _MM_HINT_T0);
++#elif defined(USE_NEON)
++                    __builtin_prefetch(getDataByInternalId(*datal), 0, 3);
+ #endif
+                     for (int i = 0; i < size; i++) {
+ #ifdef USE_SSE
+                         _mm_prefetch(getDataByInternalId(*(datal + i + 1)), _MM_HINT_T0);
++#elif defined(USE_NEON)
++                        __builtin_prefetch(getDataByInternalId(*(datal + i + 1)), 0, 3);
+ #endif
+                         tableint cand = datal[i];
+                         dist_t d = fstdistfunc_(dataPoint, getDataByInternalId(cand), dist_func_param_);
+diff -Naur '--exclude=.git' '--exclude=.vscode' hnswlib/hnswlib/safe_memory.h hnswlib-patch/hnswlib/safe_memory.h
+--- hnswlib/hnswlib/safe_memory.h	1970-01-01 08:00:00.000000000 +0800
++++ hnswlib-patch/hnswlib/safe_memory.h	2026-02-12 11:02:50.112296700 +0800
+@@ -0,0 +1,37 @@
++/*
++   Copyright 2026 Huawei Technologies Co., Ltd.
++  
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++  
++       http://www.apache.org/licenses/LICENSE-2.0
++  
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++ */
++
++#pragma once
++#include <cstring>
++#include <stdexcept>
++
++namespace SafeMemory {
++
++template <typename D, typename S>
++void CheckAndMemcpy(D *dest, size_t destBufferSize, const S *src, size_t srcBufferSize) {
++    if (srcBufferSize > destBufferSize) {
++        throw std::invalid_argument(
++            "Memcpy failed: destBufferSize[" + std::to_string(destBufferSize) +
++            "] should be >= srcBufferSize[" + std::to_string(srcBufferSize) + "]."
++        );
++    }
++    if (dest == nullptr || (src == nullptr && srcBufferSize != 0)) {
++        throw std::invalid_argument("Memcpy failed: null pointer detected");
++    }
++    memcpy(dest, src, srcBufferSize);
++}
++
++}  // namespace SafeMemory

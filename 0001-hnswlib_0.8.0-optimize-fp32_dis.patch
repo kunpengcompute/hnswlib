@@ -1,0 +1,634 @@
+diff -Naur '--exclude=.git' '--exclude=.vscode' hnswlib/CMakeLists.txt hnswlib-patch/CMakeLists.txt
+--- hnswlib/CMakeLists.txt	2026-02-10 10:23:30.637526600 +0800
++++ hnswlib-patch/CMakeLists.txt	2026-02-10 15:08:32.806517000 +0800
+@@ -48,7 +48,11 @@
+         endif()
+       endif()
+     elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+-      SET( CMAKE_CXX_FLAGS  "-Ofast -lrt -std=c++11 -DHAVE_CXX0X -march=native -fpic -w -fopenmp -ftree-vectorize -ftree-vectorizer-verbose=0" )
++      if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm|aarch64|arm64")
++        SET( CMAKE_CXX_FLAGS  "-Ofast -lrt -std=c++11 -DHAVE_CXX0X -march=armv8.2-a+dotprod -fpic -w -fopenmp -ftree-vectorize -ftree-vectorizer-verbose=0 -DUSE_NEON" )
++      else()
++        SET( CMAKE_CXX_FLAGS  "-Ofast -lrt -std=c++11 -DHAVE_CXX0X -march=native -fpic -w -fopenmp -ftree-vectorize -ftree-vectorizer-verbose=0" )
++      endif()
+     elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+       SET( CMAKE_CXX_FLAGS  "/O2 -DHAVE_CXX0X /W1 /openmp /EHsc" )
+     endif()
+@@ -102,4 +106,7 @@
+ 
+     add_executable(main tests/cpp/main.cpp tests/cpp/sift_1b.cpp)
+     target_link_libraries(main hnswlib)
++
++    add_executable(distance_calculation_neon_test tests/cpp/distance_calculation_neon.cpp)
++    target_link_libraries(distance_calculation_neon_test hnswlib)
+ endif()
+diff -Naur '--exclude=.git' '--exclude=.vscode' hnswlib/README.md hnswlib-patch/README.md
+--- hnswlib/README.md	2026-02-10 10:23:30.641528100 +0800
++++ hnswlib-patch/README.md	2026-02-10 10:26:44.819184500 +0800
+@@ -25,8 +25,8 @@
+ ### Highlights:
+ 1) Lightweight, header-only, no dependencies other than C++ 11
+ 2) Interfaces for C++, Python, external support for Java and R (https://github.com/jlmelville/rcpphnsw).
+-3) Has full support for incremental index construction and updating the elements. Has support for element deletions 
+-(by marking them in index). Index is picklable.
++3) Has full support for incremental index construction and updating the elements (thanks to the contribution by Apoorv Sharma). Has support for element deletions 
++(by marking them in index, later can be replaced with other elements). Python index is picklable.
+ 4) Can work with custom user defined distances (C++).
+ 5) Significantly less memory footprint and faster build time compared to current nmslib's implementation.
+ 
+diff -Naur '--exclude=.git' '--exclude=.vscode' hnswlib/hnswlib/space_ip.h hnswlib-patch/hnswlib/space_ip.h
+--- hnswlib/hnswlib/space_ip.h	2026-02-10 10:23:30.651527800 +0800
++++ hnswlib-patch/hnswlib/space_ip.h	2026-02-12 10:59:44.522962500 +0800
+@@ -1,5 +1,29 @@
++/*
++   Copyright 2026 Huawei Technologies Co., Ltd.
++  
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++  
++       http://www.apache.org/licenses/LICENSE-2.0
++  
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++ */
++
++/**
++ * Modifications:
++ * - 2026 BoostKit: NEON vectorized distance calculation is supported.
++ */
++
+ #pragma once
+ #include "hnswlib.h"
++#ifdef USE_NEON
++#include "arm_neon.h"
++#endif
+ 
+ namespace hnswlib {
+ 
+@@ -339,6 +363,120 @@
+ }
+ #endif
+ 
++#if defined(USE_NEON)
++
++static float
++InnerProductSIMD16ExtNEON(const void *pVect1v, const void *pVect2v, const void *qty_ptr) {
++    float *x = (float *) pVect1v;
++    float *y = (float *) pVect2v;
++    size_t qty = *((size_t *) qty_ptr);
++
++    size_t i;
++    float res;
++    constexpr size_t single_round = 16;
++
++    float32x4_t x8_0 = vld1q_f32(x);
++    float32x4_t x8_1 = vld1q_f32(x + 4);
++    float32x4_t x8_2 = vld1q_f32(x + 8);
++    float32x4_t x8_3 = vld1q_f32(x + 12);
++
++    float32x4_t y8_0 = vld1q_f32(y);
++    float32x4_t y8_1 = vld1q_f32(y + 4);
++    float32x4_t y8_2 = vld1q_f32(y + 8);
++    float32x4_t y8_3 = vld1q_f32(y + 12);
++
++    float32x4_t d8_0 = vmulq_f32(x8_0, y8_0);
++    float32x4_t d8_1 = vmulq_f32(x8_1, y8_1);
++    float32x4_t d8_2 = vmulq_f32(x8_2, y8_2);
++    float32x4_t d8_3 = vmulq_f32(x8_3, y8_3);
++
++    for (i = single_round; i <= qty - single_round; i += single_round) {
++        x8_0 = vld1q_f32(x + i);
++        y8_0 = vld1q_f32(y + i);
++        d8_0 = vmlaq_f32(d8_0, x8_0, y8_0);
++
++        x8_1 = vld1q_f32(x + i + 4);
++        y8_1 = vld1q_f32(y + i + 4);
++        d8_1 = vmlaq_f32(d8_1, x8_1, y8_1);
++
++        x8_2 = vld1q_f32(x + i + 8);
++        y8_2 = vld1q_f32(y + i + 8);
++        d8_2 = vmlaq_f32(d8_2, x8_2, y8_2);
++
++        x8_3 = vld1q_f32(x + i + 12);
++        y8_3 = vld1q_f32(y + i + 12);
++        d8_3 = vmlaq_f32(d8_3, x8_3, y8_3);
++    }
++
++    d8_0 = vaddq_f32(d8_0, d8_1);
++    d8_2 = vaddq_f32(d8_2, d8_3);
++    d8_0 = vaddq_f32(d8_0, d8_2);
++    res = vaddvq_f32(d8_0);
++
++    return (res);
++}
++
++static float
++InnerProductDistanceSIMD16ExtNEON(const void *pVect1v, const void *pVect2v, const void *qty_ptr) {
++    return 1.0f - InnerProductSIMD16ExtNEON(pVect1v, pVect2v, qty_ptr);
++}
++
++static float
++InnerProductSIMD4ExtNEON(const void *pVect1v, const void *pVect2v, const void *qty_ptr) {
++    float *x = (float *) pVect1v;
++    float *y = (float *) pVect2v;
++    size_t qty = *((size_t *) qty_ptr);
++
++    size_t i;
++    float res;
++    constexpr size_t single_round = 4;
++
++    float32x4_t x8_0 = vld1q_f32(x);
++    float32x4_t y8_0 = vld1q_f32(y);
++    float32x4_t d8_0 = vmulq_f32(x8_0, y8_0);
++
++    for (i = single_round; i <= qty - single_round; i += single_round) {
++        x8_0 = vld1q_f32(x + i);
++        y8_0 = vld1q_f32(y + i);
++        d8_0 = vmlaq_f32(d8_0, x8_0, y8_0);
++    }
++    res = vaddvq_f32(d8_0);
++
++    return (res);
++}
++
++static float
++InnerProductDistanceSIMD4ExtNEON(const void *pVect1v, const void *pVect2v, const void *qty_ptr) {
++    return 1.0f - InnerProductSIMD4ExtNEON(pVect1v, pVect2v, qty_ptr);
++}
++
++static float
++InnerProductDistanceSIMD16ExtResidualsNEON(const void *pVect1v, const void *pVect2v, const void *qty_ptr) {
++    size_t qty = *((size_t *) qty_ptr);
++    size_t qty16 = qty >> 4 << 4;
++    float res_16 = InnerProductSIMD16ExtNEON(pVect1v, pVect2v, &qty16);
++    
++    size_t qty_left = qty - qty16;
++    float *pVect1 = (float *) pVect1v + qty16;
++    float *pVect2 = (float *) pVect2v + qty16;
++    float res_tail = InnerProduct(pVect1, pVect2, &qty_left);
++    return 1.0f - (res_16 + res_tail);
++}
++
++static float
++InnerProductDistanceSIMD4ExtResidualsNEON(const void *pVect1v, const void *pVect2v, const void *qty_ptr) {
++    size_t qty = *((size_t *) qty_ptr);
++    size_t qty4 = qty >> 2 << 2;
++    float res = InnerProductSIMD4ExtNEON(pVect1v, pVect2v, &qty4);
++
++    size_t qty_left = qty - qty4;
++    float *pVect1 = (float *) pVect1v + qty4;
++    float *pVect2 = (float *) pVect2v + qty4;
++    float res_tail = InnerProduct(pVect1, pVect2, &qty_left);
++    return 1.0f - (res + res_tail);
++}
++#endif
++
+ class InnerProductSpace : public SpaceInterface<float> {
+     DISTFUNC<float> fstdistfunc_;
+     size_t data_size_;
+@@ -347,7 +485,7 @@
+  public:
+     InnerProductSpace(size_t dim) {
+         fstdistfunc_ = InnerProductDistance;
+-#if defined(USE_AVX) || defined(USE_SSE) || defined(USE_AVX512)
++#if defined(USE_AVX) || defined(USE_SSE) || defined(USE_AVX512) || defined(USE_NEON)
+     #if defined(USE_AVX512)
+         if (AVX512Capable()) {
+             InnerProductSIMD16Ext = InnerProductSIMD16ExtAVX512;
+@@ -369,6 +507,16 @@
+         }
+     #endif
+ 
++    #if defined(USE_NEON)
++        if (dim > 0 && dim % 16 == 0)
++            fstdistfunc_ = InnerProductDistanceSIMD16ExtNEON;
++        else if (dim % 4 == 0)
++            fstdistfunc_ = InnerProductDistanceSIMD4ExtNEON;
++        else if (dim > 16)
++            fstdistfunc_ = InnerProductDistanceSIMD16ExtResidualsNEON;
++        else if (dim > 4)
++            fstdistfunc_ = InnerProductDistanceSIMD4ExtResidualsNEON;
++    #else
+         if (dim % 16 == 0)
+             fstdistfunc_ = InnerProductDistanceSIMD16Ext;
+         else if (dim % 4 == 0)
+@@ -377,6 +525,7 @@
+             fstdistfunc_ = InnerProductDistanceSIMD16ExtResiduals;
+         else if (dim > 4)
+             fstdistfunc_ = InnerProductDistanceSIMD4ExtResiduals;
++    #endif
+ #endif
+         dim_ = dim;
+         data_size_ = dim * sizeof(float);
+diff -Naur '--exclude=.git' '--exclude=.vscode' hnswlib/hnswlib/space_l2.h hnswlib-patch/hnswlib/space_l2.h
+--- hnswlib/hnswlib/space_l2.h	2026-02-10 10:23:30.652527400 +0800
++++ hnswlib-patch/hnswlib/space_l2.h	2026-02-12 11:00:04.938441700 +0800
+@@ -1,5 +1,29 @@
++/*
++   Copyright 2026 Huawei Technologies Co., Ltd.
++  
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++  
++       http://www.apache.org/licenses/LICENSE-2.0
++  
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++ */
++
++/**
++ * Modifications:
++ * - 2026 BoostKit: NEON vectorized distance calculation is supported.
++ */
++
+ #pragma once
+ #include "hnswlib.h"
++#ifdef USE_NEON
++#include "arm_neon.h"
++#endif
+ 
+ namespace hnswlib {
+ 
+@@ -205,6 +229,122 @@
+ }
+ #endif
+ 
++#if defined(USE_NEON)
++
++static float
++L2SqrSIMD16ExtNEON(const void *pVect1v, const void *pVect2v, const void *qty_ptr) {
++    float *x = (float *) pVect1v;
++    float *y = (float *) pVect2v;
++    size_t qty = *((size_t *) qty_ptr);
++
++    size_t i;
++    float res;
++    constexpr size_t single_round = 16;
++
++    
++    float32x4_t x8_0 = vld1q_f32(x);
++    float32x4_t x8_1 = vld1q_f32(x + 4);
++    float32x4_t x8_2 = vld1q_f32(x + 8);
++    float32x4_t x8_3 = vld1q_f32(x + 12);
++
++    float32x4_t y8_0 = vld1q_f32(y);
++    float32x4_t y8_1 = vld1q_f32(y + 4);
++    float32x4_t y8_2 = vld1q_f32(y + 8);
++    float32x4_t y8_3 = vld1q_f32(y + 12);
++
++    float32x4_t q8_0 = vsubq_f32(x8_0, y8_0);
++    float32x4_t q8_1 = vsubq_f32(x8_1, y8_1);
++    float32x4_t q8_2 = vsubq_f32(x8_2, y8_2);
++    float32x4_t q8_3 = vsubq_f32(x8_3, y8_3);
++
++    float32x4_t d8_0 = vmulq_f32(q8_0, q8_0);
++    float32x4_t d8_1 = vmulq_f32(q8_1, q8_1);
++    float32x4_t d8_2 = vmulq_f32(q8_2, q8_2);
++    float32x4_t d8_3 = vmulq_f32(q8_3, q8_3);
++
++    for (i = single_round; i <= qty - single_round; i += single_round) {
++        x8_0 = vld1q_f32(x + i);
++        x8_1 = vld1q_f32(x + i + 4);
++        x8_2 = vld1q_f32(x + i + 8);
++        x8_3 = vld1q_f32(x + i + 12);
++
++        y8_0 = vld1q_f32(y + i);
++        y8_1 = vld1q_f32(y + i + 4);
++        y8_2 = vld1q_f32(y + i + 8);
++        y8_3 = vld1q_f32(y + i + 12);
++
++        q8_0 = vsubq_f32(x8_0, y8_0);
++        q8_1 = vsubq_f32(x8_1, y8_1);
++        q8_2 = vsubq_f32(x8_2, y8_2);
++        q8_3 = vsubq_f32(x8_3, y8_3);
++
++        d8_0 = vmlaq_f32(d8_0, q8_0, q8_0);
++        d8_1 = vmlaq_f32(d8_1, q8_1, q8_1);
++        d8_2 = vmlaq_f32(d8_2, q8_2, q8_2);
++        d8_3 = vmlaq_f32(d8_3, q8_3, q8_3);
++    }
++
++    d8_0 = vaddq_f32(d8_0, d8_1);
++    d8_2 = vaddq_f32(d8_2, d8_3);
++    d8_0 = vaddq_f32(d8_0, d8_2);
++    res = vaddvq_f32(d8_0);
++
++    return (res);
++}
++
++static float
++L2SqrSIMD4ExtNEON(const void *pVect1v, const void *pVect2v, const void *qty_ptr) {
++    float *x = (float *) pVect1v;
++    float *y = (float *) pVect2v;
++    size_t qty = *((size_t *) qty_ptr);
++
++    size_t i;
++    float res;
++    constexpr size_t single_round = 4;
++
++    float32x4_t x8_0 = vld1q_f32(x);
++    float32x4_t y8_0 = vld1q_f32(y);
++    float32x4_t q8_0 = vsubq_f32(x8_0, y8_0);
++    float32x4_t d8_0 = vmulq_f32(q8_0, q8_0);
++
++    for (i = single_round; i <= qty - single_round; i += single_round) {
++        x8_0 = vld1q_f32(x + i);
++        y8_0 = vld1q_f32(y + i);
++        q8_0 = vsubq_f32(x8_0, y8_0);
++        d8_0 = vmlaq_f32(d8_0, q8_0, q8_0);
++    }
++    res = vaddvq_f32(d8_0);
++
++    return (res);
++}
++
++static float
++L2SqrSIMD16ExtResidualsNEON(const void *pVect1v, const void *pVect2v, const void *qty_ptr) {
++    size_t qty = *((size_t *) qty_ptr);
++    size_t qty16 = qty >> 4 << 4;
++    float res_16 = L2SqrSIMD16ExtNEON(pVect1v, pVect2v, &qty16);
++    
++    size_t qty_left = qty - qty16;
++    float *pVect1 = (float *) pVect1v + qty16;
++    float *pVect2 = (float *) pVect2v + qty16;
++    float res_tail = L2Sqr(pVect1, pVect2, &qty_left);
++    return (res_16 + res_tail);
++}
++
++static float
++L2SqrSIMD4ExtResidualsNEON(const void *pVect1v, const void *pVect2v, const void *qty_ptr) {
++    size_t qty = *((size_t *) qty_ptr);
++    size_t qty4 = qty >> 2 << 2;
++    float res = L2SqrSIMD4ExtNEON(pVect1v, pVect2v, &qty4);
++
++    size_t qty_left = qty - qty4;
++    float *pVect1 = (float *) pVect1v + qty4;
++    float *pVect2 = (float *) pVect2v + qty4;
++    float res_tail = L2Sqr(pVect1, pVect2, &qty_left);
++    return (res + res_tail);
++}
++#endif
++
+ class L2Space : public SpaceInterface<float> {
+     DISTFUNC<float> fstdistfunc_;
+     size_t data_size_;
+@@ -213,7 +353,7 @@
+  public:
+     L2Space(size_t dim) {
+         fstdistfunc_ = L2Sqr;
+-#if defined(USE_SSE) || defined(USE_AVX) || defined(USE_AVX512)
++#if defined(USE_SSE) || defined(USE_AVX) || defined(USE_AVX512) || defined(USE_NEON)
+     #if defined(USE_AVX512)
+         if (AVX512Capable())
+             L2SqrSIMD16Ext = L2SqrSIMD16ExtAVX512;
+@@ -224,6 +364,16 @@
+             L2SqrSIMD16Ext = L2SqrSIMD16ExtAVX;
+     #endif
+ 
++    #if defined(USE_NEON)
++        if (dim > 0 && dim % 16 == 0)
++            fstdistfunc_ = L2SqrSIMD16ExtNEON;
++        else if (dim % 4 == 0)
++            fstdistfunc_ = L2SqrSIMD4ExtNEON;
++        else if (dim > 16)
++            fstdistfunc_ = L2SqrSIMD16ExtResidualsNEON;
++        else if (dim > 4)
++            fstdistfunc_ = L2SqrSIMD4ExtResidualsNEON;
++    #else
+         if (dim % 16 == 0)
+             fstdistfunc_ = L2SqrSIMD16Ext;
+         else if (dim % 4 == 0)
+@@ -232,6 +382,7 @@
+             fstdistfunc_ = L2SqrSIMD16ExtResiduals;
+         else if (dim > 4)
+             fstdistfunc_ = L2SqrSIMD4ExtResiduals;
++    #endif
+ #endif
+         dim_ = dim;
+         data_size_ = dim * sizeof(float);
+diff -Naur '--exclude=.git' '--exclude=.vscode' hnswlib/hnswlib/stop_condition.h hnswlib-patch/hnswlib/stop_condition.h
+--- hnswlib/hnswlib/stop_condition.h	2026-02-10 10:23:30.652527400 +0800
++++ hnswlib-patch/hnswlib/stop_condition.h	2026-02-10 15:10:18.688379100 +0800
+@@ -1,3 +1,24 @@
++/*
++   Copyright 2026 Huawei Technologies Co., Ltd.
++  
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++  
++       http://www.apache.org/licenses/LICENSE-2.0
++  
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++ */
++
++/**
++ * Modifications:
++ * - 2026 BoostKit: NEON vectorized distance calculation is supported.
++ */
++
+ #pragma once
+ #include "space_l2.h"
+ #include "space_ip.h"
+@@ -36,6 +57,16 @@
+             L2SqrSIMD16Ext = L2SqrSIMD16ExtAVX;
+     #endif
+ 
++    #if defined(USE_NEON)
++        if (dim % 16 == 0)
++            fstdistfunc_ = L2SqrSIMD16ExtNEON;
++        else if (dim % 4 == 0)
++            fstdistfunc_ = L2SqrSIMD4ExtNEON;
++        else if (dim > 16)
++            fstdistfunc_ = L2SqrSIMD16ExtResidualsNEON;
++        else if (dim > 4)
++            fstdistfunc_ = L2SqrSIMD4ExtResidualsNEON;
++    #else
+         if (dim % 16 == 0)
+             fstdistfunc_ = L2SqrSIMD16Ext;
+         else if (dim % 4 == 0)
+@@ -44,6 +75,7 @@
+             fstdistfunc_ = L2SqrSIMD16ExtResiduals;
+         else if (dim > 4)
+             fstdistfunc_ = L2SqrSIMD4ExtResiduals;
++    #endif
+ #endif
+         dim_ = dim;
+         vector_size_ = dim * sizeof(float);
+@@ -106,6 +138,16 @@
+         }
+     #endif
+ 
++    #if defined(USE_NEON)
++        if (dim % 16 == 0)
++            fstdistfunc_ = InnerProductDistanceSIMD16ExtNEON;
++        else if (dim % 4 == 0)
++            fstdistfunc_ = InnerProductDistanceSIMD4ExtNEON;
++        else if (dim > 16)
++            fstdistfunc_ = InnerProductDistanceSIMD16ExtResidualsNEON;
++        else if (dim > 4)
++            fstdistfunc_ = InnerProductDistanceSIMD4ExtResidualsNEON;
++    #else
+         if (dim % 16 == 0)
+             fstdistfunc_ = InnerProductDistanceSIMD16Ext;
+         else if (dim % 4 == 0)
+@@ -114,6 +156,7 @@
+             fstdistfunc_ = InnerProductDistanceSIMD16ExtResiduals;
+         else if (dim > 4)
+             fstdistfunc_ = InnerProductDistanceSIMD4ExtResiduals;
++    #endif
+ #endif
+         vector_size_ = dim * sizeof(float);
+         data_size_ = vector_size_ + sizeof(DOCIDTYPE);
+diff -Naur '--exclude=.git' '--exclude=.vscode' hnswlib/tests/cpp/distance_calculation_neon.cpp hnswlib-patch/tests/cpp/distance_calculation_neon.cpp
+--- hnswlib/tests/cpp/distance_calculation_neon.cpp	1970-01-01 08:00:00.000000000 +0800
++++ hnswlib-patch/tests/cpp/distance_calculation_neon.cpp	2026-02-10 15:10:48.324934300 +0800
+@@ -0,0 +1,136 @@
++/*
++   Copyright 2026 Huawei Technologies Co., Ltd.
++  
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++  
++       http://www.apache.org/licenses/LICENSE-2.0
++  
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++ */
++
++#include <cstring>
++#include <vector>
++#include <cmath>
++#include "../../hnswlib/hnswlib.h"
++
++using namespace hnswlib;
++
++std::vector<float> generate_random_vector(size_t n, float min = -1.0f, float max = 1.0f)
++{
++    std::vector<float> vec(n);
++    for (size_t i = 0; i < n; ++i) {
++        float val = min + static_cast<float>(rand()) / RAND_MAX * (max - min);
++        vec[i] = val;
++    }
++    return vec;
++}
++
++#ifdef USE_NEON
++bool run_distance_ip_test(size_t N) {
++    auto vec1 = generate_random_vector(N);
++    auto vec2 = generate_random_vector(N);
++
++    size_t qty = N;
++    float expected = InnerProductDistance(vec1.data(), vec2.data(), &qty);
++
++    float result = 0;
++    if (N % 16 == 0) {
++        result = InnerProductDistanceSIMD16ExtNEON(vec1.data(), vec2.data(), &qty);
++    } else if (N % 4 == 0) {
++        result = InnerProductDistanceSIMD4ExtNEON(vec1.data(), vec2.data(), &qty);
++    } else if (N > 16) {
++        result = InnerProductDistanceSIMD16ExtResidualsNEON(vec1.data(), vec2.data(), &qty);
++    } else if (N > 4) {
++        result = InnerProductDistanceSIMD4ExtResidualsNEON(vec1.data(), vec2.data(), &qty);
++    } else {
++        result = InnerProductDistance(vec1.data(), vec2.data(), &qty);
++    }
++
++    float diff = std::fabs(result - expected);
++    if (diff > 1e-4f) {
++        std::cout << "[FAIL] InnerProduct test for N=" << N 
++                  << " | Result: " << result 
++                  << " | Expected: " << expected 
++                  << " | Diff: " << diff << std::endl;
++        return false;
++    } else {
++        std::cout << "[PASS] InnerProduct test for N=" << N << std::endl;
++        return true;
++    }
++}
++
++
++bool run_distance_l2_test(size_t N) {
++    auto vec1 = generate_random_vector(N);
++    auto vec2 = generate_random_vector(N);
++
++    size_t qty = N;
++    float expected = L2Sqr(vec1.data(), vec2.data(), &qty);
++
++    float result = 0;
++    if (N % 16 == 0) {
++        result = L2SqrSIMD16ExtNEON(vec1.data(), vec2.data(), &qty);
++    } else if (N % 4 == 0) {
++        result = L2SqrSIMD4ExtNEON(vec1.data(), vec2.data(), &qty);
++    } else if (N > 16) {
++        result = L2SqrSIMD16ExtResidualsNEON(vec1.data(), vec2.data(), &qty);
++    } else if (N > 4) {
++        result = L2SqrSIMD4ExtResidualsNEON(vec1.data(), vec2.data(), &qty);
++    } else {
++        result = L2Sqr(vec1.data(), vec2.data(), &qty);
++    }
++
++    float diff = std::fabs(result - expected);
++    if (diff > 1e-4f) {
++        std::cout << "[FAIL] L2 test for N=" << N 
++                  << " | Result: " << result 
++                  << " | Expected: " << expected 
++                  << " | Diff: " << diff << std::endl;
++        return false;
++    } else {
++        std::cout << "[PASS] L2 test for N=" << N << std::endl;
++        return true;
++    }
++}
++#endif
++
++int main() {
++#ifdef USE_NEON
++    std::srand(static_cast<unsigned int>(std::time(nullptr)));
++
++    std::vector<size_t> test_sizes = {1024, 512, 65, 64, 37, 36, 18, 9, 3, 2, 1};
++    bool all_tests_passed = true;
++
++    std::cout << "=== Start testing the InnerProduct distance calculation. ===" << std::endl;
++    for (size_t size : test_sizes) {
++        if (!run_distance_ip_test(size)) {
++            all_tests_passed = false;
++        }
++    }
++
++    std::cout << "\n=== Start testing the L2 distance calculation. ===" << std::endl;
++    for (size_t size : test_sizes) {
++        if (!run_distance_l2_test(size)) {
++            all_tests_passed = false;
++        }
++    }
++
++    std::cout << "\n=== Result Summary ===" << std::endl;
++    if (all_tests_passed) {
++        std::cout << "All tests passed!" << std::endl;
++        return 0;
++    } else {
++        std::cout << "Some tests failed!" << std::endl;
++        return 1;
++    }
++#else
++    std::cout << "This test cannot be performed because the NEON macro is not enabled." << std::endl;
++    return 1;
++#endif;
++}
