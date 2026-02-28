@@ -1,293 +1,182 @@
-# 项目介绍<a name="ZH-CN_TOPIC_0000002508579577"></a>
-
-本项目旨在基于开源hnswlib，引入FP16数据类型支持，并针对鲲鹏ARM平台进行深度优化。通过数据类型优化和平台特定调优，实现在保持检索精度的前提下，显著提升计算效率并降低内存占用。改造后的hnswlib将充分利用鲲鹏ARM架构的硬件特性，包括通过编译器优化、内存访问优化、以及ARM向量化改造等手段，实现跨平台性能优化。
-
-# 环境部署<a name="ZH-CN_TOPIC_0000002476580618"></a>
+# hnswlib介绍<a name="ZH-CN_TOPIC_0000002549926519"></a>
 
 
 
-## 已验证环境<a name="ZH-CN_TOPIC_0000002476591056"></a>
+
+
+
+
+
+
+
+
+
+
+## 最新消息<a name="ZH-CN_TOPIC_0000002551970445"></a>
+
+-   \[2025.12.30\]：hnswlib发布于Gitcode平台，支持fp16数据类型，支持NEON和SVE向量化、预取和底库id重排优化。
+-   \[2026.3.30\]：hnswlib重构版本发布于Gitcode平台，支持fp16数据类型，支持NEON向量化、预取和底库id重排优化，重构后的hnswlib精简了代码结构，提升了易用性。
+
+
+## 项目介绍<a name="ZH-CN_TOPIC_0000002551604903"></a>
+
+基于开源hnswlib（Hierarchical Navigable Small World），引入FP16数据类型支持，并针对鲲鹏ARM平台进行深度优化。通过数据类型优化和平台特定调优，实现在保持检索精度的前提下，显著提升计算效率并降低内存占用。改造后的hnswlib将充分利用鲲鹏ARM架构的硬件特性，包括通过编译器优化、内存访问优化、以及ARM向量化改造等手段，实现跨平台性能优化。
+
+hnswlib（Hierarchical Navigable Small World）是一个高效的近似最近邻 （Approximate Nearest Neighbor，ANN）搜索库，特别适用于大规模数据集。它通过构建层次化的图结构，实现了快速的搜索性能。hnswlib支持多种距离度量，如L2（欧氏）距离、IP（内积）距离等，并且可以处理高维数据。该库广泛应用于推荐系统、图像检索、自然语言处理等领域。
+
+**应用场景<a name="section1268521411013"></a>**
+
+hnswlib适用于推荐系统召回阶段，当数据集的数据类型为FP16时，可使用新增的FP16接口进行图检索，从而优化计算效率与内存占用。
+
+**算法原理<a name="section975104591010"></a>**
+
+hnswlib的核心原理是基于分层可导航小世界（HNSW）图结构来组织高维空间中的数据点，从而在近似最近邻搜索中实现查询速度与精度之间的高效平衡。
+
+-   该算法通过构建一个多层图结构来工作，其中底层图包含数据集中所有节点，而越高层数则包含越少的节点，这些高层节点间形成的“长连接”充当了快速导航的“高速公路”。
+-   当需要插入一个新节点时，算法会通过一个指数衰减的概率分布随机决定该节点出现的最高层数，然后从该层开始向下，逐层寻找该节点的最近邻并建立连接。
+-   关键参数M控制了每个节点在各层中的最大连接数，直接影响图的稠密度和搜索质量。在进行最近邻搜索时，查询过程从最高层入口点开始，利用长连接快速定位到目标区域，然后逐层向下细化搜索，通过贪婪遍历逼近最近邻节点。
+-   参数ef则用于动态控制搜索过程中维护的候选队列大小，其值越大通常搜索精度越高但耗时越长。这种分层结构有效减少了搜索时需要访问的节点数量，使得hnswlib在面对大规模高维数据时，相比传统精确搜索方法能显著提升效率，同时保持较高的召回率。
+
+FP16数据类型将每个向量分量的存储空间从FP32的4字节减少到2字节。这使得在构建HNSW索引时，所需的内存空间大幅降低，从而允许在有限的硬件资源下处理更大规模的向量数据集。同时，针对鲲鹏ARM架构，对hnswlib的距离计算算法进行优化，提升了图检索过程中的节点距离比较效率。
+
+
+## 目录结构<a name="ZH-CN_TOPIC_0000002551970447"></a>
+
+hnswlib开源仓完整的目录结构如下所示：
+
+```text
+├── docs/                                                             // 学习文档
+├── public_sys-resources/
+├── 0001-hnswlib_0.8.0-optimize-fp32_fp16_dis_idsort_prefetch.patch   // hnswlib源码补丁文件
+├── LICENSE                                                           // 项目License文件
+└── README.md                                                         // hnswlib开源仓介绍文件
+```
+
+## 版本说明<a name="ZH-CN_TOPIC_0000002521010466"></a>
+
+hnswlib基于开源hnswlib  **V0.8.0**版本进行开发。
+
+## 兼容性信息<a name="ZH-CN_TOPIC_0000002520850478"></a>
+
+hnswlib已验证环境如下：
 
 <a name="table7770454131613"></a>
-<table><thead align="left"><tr id="row277155418163"><th class="cellrowborder" valign="top" width="10.97670698790363%" id="mcps1.1.8.1.1"><p id="p14771195491617"><a name="p14771195491617"></a><a name="p14771195491617"></a>算法</p>
+<table><thead align="left"><tr id="row277155418163"><th class="cellrowborder" valign="top" width="21.469999999999995%" id="mcps1.1.6.1.1"><p id="p11771155413168"><a name="p11771155413168"></a><a name="p11771155413168"></a>操作系统</p>
 </th>
-<th class="cellrowborder" valign="top" width="10.92672198340498%" id="mcps1.1.8.1.2"><p id="p9771454151614"><a name="p9771454151614"></a><a name="p9771454151614"></a>包类型</p>
+<th class="cellrowborder" valign="top" width="23.659999999999997%" id="mcps1.1.6.1.2"><p id="p1771105413168"><a name="p1771105413168"></a><a name="p1771105413168"></a>CPU类型</p>
 </th>
-<th class="cellrowborder" valign="top" width="16.764970508847345%" id="mcps1.1.8.1.3"><p id="p11771155413168"><a name="p11771155413168"></a><a name="p11771155413168"></a>操作系统</p>
+<th class="cellrowborder" valign="top" width="18.29%" id="mcps1.1.6.1.3"><p id="p67718545169"><a name="p67718545169"></a><a name="p67718545169"></a>内存</p>
 </th>
-<th class="cellrowborder" valign="top" width="18.47445766270119%" id="mcps1.1.8.1.4"><p id="p1771105413168"><a name="p1771105413168"></a><a name="p1771105413168"></a>CPU类型</p>
+<th class="cellrowborder" valign="top" width="18.29%" id="mcps1.1.6.1.4"><p id="p57711054121613"><a name="p57711054121613"></a><a name="p57711054121613"></a>编译器</p>
 </th>
-<th class="cellrowborder" valign="top" width="14.285714285714285%" id="mcps1.1.8.1.5"><p id="p67718545169"><a name="p67718545169"></a><a name="p67718545169"></a>内存</p>
-</th>
-<th class="cellrowborder" valign="top" width="14.285714285714285%" id="mcps1.1.8.1.6"><p id="p57711054121613"><a name="p57711054121613"></a><a name="p57711054121613"></a>编译器</p>
-</th>
-<th class="cellrowborder" valign="top" width="14.285714285714285%" id="mcps1.1.8.1.7"><p id="p137711854171610"><a name="p137711854171610"></a><a name="p137711854171610"></a>其他</p>
+<th class="cellrowborder" valign="top" width="18.29%" id="mcps1.1.6.1.5"><p id="p137711854171610"><a name="p137711854171610"></a><a name="p137711854171610"></a>其他</p>
 </th>
 </tr>
 </thead>
-<tbody><tr id="row177115418161"><td class="cellrowborder" rowspan="2" valign="top" width="10.97670698790363%" headers="mcps1.1.8.1.1 "><p id="p225222510179"><a name="p225222510179"></a><a name="p225222510179"></a>hnswlib</p>
+<tbody><tr id="row177115418161"><td class="cellrowborder" valign="top" width="21.469999999999995%" headers="mcps1.1.6.1.1 "><p id="p577185419166"><a name="p577185419166"></a><a name="p577185419166"></a>openEuler 22.03 LTS SP3</p>
 </td>
-<td class="cellrowborder" rowspan="2" valign="top" width="10.92672198340498%" headers="mcps1.1.8.1.2 "><p id="p1997932151717"><a name="p1997932151717"></a><a name="p1997932151717"></a>源码包</p>
+<td class="cellrowborder" valign="top" width="23.659999999999997%" headers="mcps1.1.6.1.2 "><p id="p1178432114216"><a name="p1178432114216"></a><a name="p1178432114216"></a>鲲鹏920 7282C处理器</p>
 </td>
-<td class="cellrowborder" valign="top" width="16.764970508847345%" headers="mcps1.1.8.1.3 "><p id="p577185419166"><a name="p577185419166"></a><a name="p577185419166"></a>openEuler 22.03 LTS SP3</p>
+<td class="cellrowborder" valign="top" width="18.29%" headers="mcps1.1.6.1.3 "><p id="p20325717499"><a name="p20325717499"></a><a name="p20325717499"></a>16*32G</p>
 </td>
-<td class="cellrowborder" valign="top" width="18.47445766270119%" headers="mcps1.1.8.1.4 "><p id="p1178432114216"><a name="p1178432114216"></a><a name="p1178432114216"></a>鲲鹏920 7282C处理器</p>
+<td class="cellrowborder" valign="top" width="18.29%" headers="mcps1.1.6.1.4 "><p id="p13225618153916"><a name="p13225618153916"></a><a name="p13225618153916"></a>GCC 12.3.1</p>
 </td>
-<td class="cellrowborder" valign="top" width="14.285714285714285%" headers="mcps1.1.8.1.5 "><p id="p20325717499"><a name="p20325717499"></a><a name="p20325717499"></a>16 * 32G</p>
-</td>
-<td class="cellrowborder" rowspan="2" valign="top" width="14.285714285714285%" headers="mcps1.1.8.1.6 "><p id="p13225618153916"><a name="p13225618153916"></a><a name="p13225618153916"></a>GCC 12.3.1</p>
-<p id="p1451182531810"><a name="p1451182531810"></a><a name="p1451182531810"></a></p>
-</td>
-<td class="cellrowborder" rowspan="2" valign="top" width="14.285714285714285%" headers="mcps1.1.8.1.7 "><p id="p1916122941819"><a name="p1916122941819"></a><a name="p1916122941819"></a>CMake&gt;=3.22.0</p>
+<td class="cellrowborder" valign="top" width="18.29%" headers="mcps1.1.6.1.5 "><p id="p1916122941819"><a name="p1916122941819"></a><a name="p1916122941819"></a>CMake&gt;=3.22.0</p>
 </td>
 </tr>
-<tr id="row47712054131620"><td class="cellrowborder" valign="top" headers="mcps1.1.8.1.1 "><p id="p108311659483"><a name="p108311659483"></a><a name="p108311659483"></a>openEuler 24.03 LTS SP3</p>
+<tr id="row2373153174019"><td class="cellrowborder" valign="top" width="21.469999999999995%" headers="mcps1.1.6.1.1 "><p id="p108311659483"><a name="p108311659483"></a><a name="p108311659483"></a>openEuler 24.03 LTS SP3</p>
 </td>
-<td class="cellrowborder" valign="top" headers="mcps1.1.8.1.2 "><p id="p1577110547162"><a name="p1577110547162"></a><a name="p1577110547162"></a>鲲鹏920 7592C处理器</p>
+<td class="cellrowborder" valign="top" width="23.659999999999997%" headers="mcps1.1.6.1.2 "><p id="p1577110547162"><a name="p1577110547162"></a><a name="p1577110547162"></a>鲲鹏950 7592C处理器</p>
 </td>
-<td class="cellrowborder" valign="top" headers="mcps1.1.8.1.3 "><p id="p1483114520483"><a name="p1483114520483"></a><a name="p1483114520483"></a>24 * 64G</p>
+<td class="cellrowborder" valign="top" width="18.29%" headers="mcps1.1.6.1.3 "><p id="p1483114520483"><a name="p1483114520483"></a><a name="p1483114520483"></a>24*64G</p>
+</td>
+<td class="cellrowborder" valign="top" width="18.29%" headers="mcps1.1.6.1.4 "><p id="p122401813238"><a name="p122401813238"></a><a name="p122401813238"></a>GCC 12.3.1</p>
+</td>
+<td class="cellrowborder" valign="top" width="18.29%" headers="mcps1.1.6.1.5 "><p id="p12409819232"><a name="p12409819232"></a><a name="p12409819232"></a>CMake&gt;=3.22.0</p>
 </td>
 </tr>
 </tbody>
 </table>
 
-## 源码获取<a name="ZH-CN_TOPIC_0000002476751032"></a>
+## 环境部署<a name="ZH-CN_TOPIC_0000002520604912"></a>
 
-1.  获取开源代码，假设安装路径为"/path/to"。
+请先获取hnswlib源码、源码Patch补丁，并安装相关依赖工具，应用补丁文件，然后重新编译hnswlib。详细操作请参见《hnswlib安装指南》
 
-    ```
-    cd /path/to
-    git clone -b v0.8.0 https://github.com/nmslib/hnswlib.git
-    ```
+## 快速入门<a name="ZH-CN_TOPIC_0000002551604905"></a>
 
-2.  下载hnswlib的patch文件，假设安装路径为"/path/to"。
+鲲鹏优化版hnswlib核心逻辑与原生一致，但强化了ARM架构下的性能，入门流程可复用核心逻辑，重点关注鲲鹏专属调优。详细操作请参见《hnswlib快速入门》
 
-    ```
-    git clone https://gitcode.com/boostkit/hnswlib.git hnswlib-patch
-    ```
+## 学习文档<a name="ZH-CN_TOPIC_0000002552050453"></a>
 
-3.  应用patch。
-
-    ```
-    cd hnswlib
-    patch -p1 < ../hnswlib-patch/0001-hnswlib_0.8.0-optimize-fp32_fp16_dis_idsort_prefetch.patch
-    ```
-
-4.  安装GCC 12.3.1与GCC-C++ 12.3.1。
-
-    ```
-    yum install gcc-toolset-12-gcc gcc-toolset-12-gcc-c++
-    export PATH=/opt/openEuler/gcc-toolset-12/root/usr/bin/:$PATH
-    export LD_LIBRARY_PATH=/opt/openEuler/gcc-toolset-12/root/usr/lib64/:$LD_LIBRARY_PATH
-    ```
-
-5.  安装OpenMP、CMake、Make。
-
-    ```
-    yum install cmake libgomp make
-    ```
-
-6.  安装HDF5库。
-
-    ```
-    yum install hdf5-devel
-    ```
-
-
-# 快速上手<a name="ZH-CN_TOPIC_0000002508580607"></a>
-
-
-
-
-## 测试示例<a name="ZH-CN_TOPIC_0000002508714123"></a>
-
-**目录说明<a name="section20169143153012"></a>**
-
-假设程序运行的目录为"/path/to/hnswlib"，完整的目录结构应如下所示：
-
-```
-├── examples           // 功能测试文件
-├── hnswlib            // hnswlib头文件
-├── python_bindings    // python接口文件
-├── tests              // 功能测试文件
-└── ALGO_PARAMS.md
-└── CMakeLists.txt     // 功能测试CMakeLists.txt文件
-└── LICENSE
-└── Makefile           // 性能测试Makefile文件
-└── MANIFEST.in
-└── pyproject.toml
-└── README.md
-└── setup.py
-└── TESTING_RECALL.md
-```
-
-**性能测试示例<a name="section18521028313"></a>**
-
-下方使用示例以使用fashion-mnist-784-euclidean.hdf5数据集为例。
-
-1.  获取测试程序。假设路径为"/path/to/sra_test"。
-
-    ```
-    git clone https://gitcode.com/openeuler/sra_test.git
-    ```
-
-2.  创建data文件夹，获取测试数据集。
-    ```
-    cd /path/to/sra_test
-    mkdir data && cd data
-    wget http://ann-benchmarks.com/fashion-mnist-784-euclidean.hdf5 --no-check-certificate
-    ```
-
-3.  编译可执行文件。
-    ```
-    make hnswlib_test          // fp32数据类型，使用neon向量化指令。
-    make hnswlib_fp16_test     // fp16数据类型，使用neon向量化指令。
-    ```
-    完整的目录结构如下所示。
-    ```
-    ├── configs                                                   // 存放对应算法、对应数据集配置文件
-          └── hnswlib_fp16
-                └── hnswlib_fp16_fashion-mnist-784-euclidean.config
-    ├── data                                                      // 存放数据集
-          └── fashion-mnist-784-euclidean.hdf5
-    ├── include                                                   // 存放测试框架对应的头文件
-    ├── indexes
-          └── hnswlib_fp16                                        // 存放构建好的索引，需手动创建。
-                └── fashion.hnswlib                               // 构建好的索引，运行可执行文件hnswlib_fp16_test后（对应数据集配置文件“save_or_load”为save）时生成
-    ├── scripts
-          └── build.sh                                            // 脚本文件
-    ├── src                                                       // 存放测试框架对应的源文件
-    └── get_result.py
-    └── LICENSE
-    └── Makefile
-    └── README.md
-    └── test.sh                                                   // 执行性能测试的脚本
-    └── test_multi-numas.sh                                       // 执行多numa性能测试的脚本
-    └── hnswlib_fp16_test                                         // 编译后生成的可执行文件
-    └── hnswlib_test
-    
-    ```
-
-4.  运行测试脚本。
-
-    ```
-    sh test.sh hnswlib                // fp32数据类型，使用neon向量化指令。
-    sh test.sh hnswlib_fp16           // fp16数据类型，使用neon向量化指令。
-    ```
-
-    测试结果存在output文件夹中，关注测试结果的qps指标，并且召回率大于0.99。
-
-    >![](public_sys-resources/icon-note.gif) **说明：** 
-    >-   "/configs"文件夹下包含了不同数据集的配置信息，其中，index\_path是索引保存路径，save\_or\_load是图索引构建或加载选项。
-    >-   当save\_or\_load选项为save时表示构图模式，此时会将构建的图索引保存到"/index\_path"中。
-    >-   当save\_or\_load选项为load时表示加载模式，此时会从"/index\_path"中加载图索引，直接用于后续的搜索。
-    >-   首次运行时，在save模式和单NUMA的情况下运行性能测试脚本文件，保存图索引。
-    >-   在后续运行中，如果不需要修改k\_f、efc的值，则可以在load模式和整机4numa下运行脚本获取性能数据。
-    >-   如果需要修改k\_f、efc的值，则需要在save模式下重新构图。
-
-**性能测试参数调优指导<a name="section3966431183112"></a>**
-
-假设参数调优的配置文件路径为“/path/to/hnswlib/configs“，该文件夹的目录结构如下:
-
-```
-├── configs
-      ├── hnswlib
-      ├── hnswlib_fp16
-            └── hnswlib_fp16_fashion-mnist-784-euclidean.config
-```
-
-config文件的内容如下所示：
-
-```
-# HNSWLIB
-k_f = 16
-efs = 30
-efc = 200
-metric = L2
-nloop = 3
-num_threads = 64
-top_k = 10
-batch_mode = false
-batch_size = 100
-save_or_load = save
-index_path = indexes/hnsw/fashion.faiss
-```
-
-调优的参数如[表1 调优参数表](#table114596415225)所示。
-
-**表 1**  调优参数表
-
-<a name="table114596415225"></a>
-<table><thead align="left"><tr id="row4459164110224"><th class="cellrowborder" valign="top" width="12.38123812381238%" id="mcps1.2.4.1.1"><p id="p114598418224"><a name="p114598418224"></a><a name="p114598418224"></a>参数</p>
+<a name="table1191773710200"></a>
+<table><thead align="left"><tr id="row1291816372202"><th class="cellrowborder" valign="top" width="12.04120412041204%" id="mcps1.1.4.1.1"><p id="p291823714205"><a name="p291823714205"></a><a name="p291823714205"></a>学习资源类别</p>
 </th>
-<th class="cellrowborder" valign="top" width="26.512651265126514%" id="mcps1.2.4.1.2"><p id="p44598418228"><a name="p44598418228"></a><a name="p44598418228"></a>含义</p>
+<th class="cellrowborder" valign="top" width="16.67166716671667%" id="mcps1.1.4.1.2"><p id="p13918183762016"><a name="p13918183762016"></a><a name="p13918183762016"></a>学习资源名称</p>
 </th>
-<th class="cellrowborder" valign="top" width="61.106110611061105%" id="mcps1.2.4.1.3"><p id="p24598411224"><a name="p24598411224"></a><a name="p24598411224"></a>调优建议</p>
+<th class="cellrowborder" valign="top" width="71.28712871287128%" id="mcps1.1.4.1.3"><p id="p89181437152019"><a name="p89181437152019"></a><a name="p89181437152019"></a>学习资源简介</p>
 </th>
 </tr>
 </thead>
-<tbody><tr id="row1645974112221"><td class="cellrowborder" valign="top" width="12.38123812381238%" headers="mcps1.2.4.1.1 "><p id="p184591741102210"><a name="p184591741102210"></a><a name="p184591741102210"></a>k_f</p>
+<tbody><tr id="row179181137112015"><td class="cellrowborder" valign="top" width="12.04120412041204%" headers="mcps1.1.4.1.1 "><p id="p1918123710208"><a name="p1918123710208"></a><a name="p1918123710208"></a>文档</p>
 </td>
-<td class="cellrowborder" valign="top" width="26.512651265126514%" headers="mcps1.2.4.1.2 "><p id="p124591241112214"><a name="p124591241112214"></a><a name="p124591241112214"></a>每个节点在HNSW图中的最大连接数。</p>
+<td class="cellrowborder" valign="top" width="16.67166716671667%" headers="mcps1.1.4.1.2 "><p id="p2091893722011"><a name="p2091893722011"></a><a name="p2091893722011"></a>版本说明书</p>
 </td>
-<td class="cellrowborder" valign="top" width="61.106110611061105%" headers="mcps1.2.4.1.3 "><p id="p3459341122210"><a name="p3459341122210"></a><a name="p3459341122210"></a>较小的值可以减少索引的大小，但可能会降低搜索精度；较大的值可以提高搜索精度，但会增加索引的大小和构建时间。</p>
-</td>
-</tr>
-<tr id="row1645912412221"><td class="cellrowborder" valign="top" width="12.38123812381238%" headers="mcps1.2.4.1.1 "><p id="p13459134182213"><a name="p13459134182213"></a><a name="p13459134182213"></a>efs</p>
-</td>
-<td class="cellrowborder" valign="top" width="26.512651265126514%" headers="mcps1.2.4.1.2 "><p id="p7459341192219"><a name="p7459341192219"></a><a name="p7459341192219"></a>在搜索时，每个节点的候选邻居数量。</p>
-</td>
-<td class="cellrowborder" valign="top" width="61.106110611061105%" headers="mcps1.2.4.1.3 "><p id="p15459941202217"><a name="p15459941202217"></a><a name="p15459941202217"></a>较小的值可以加快搜索速度，但可能会降低搜索精度；较大的值可以提高搜索精度，但会增加搜索时间。</p>
+<td class="cellrowborder" valign="top" width="71.28712871287128%" headers="mcps1.1.4.1.3 "><p id="p491893752010"><a name="p491893752010"></a><a name="p491893752010"></a>提供hnswlib每个发布版本的基础信息和特性更新信息。</p>
 </td>
 </tr>
-<tr id="row11459741202211"><td class="cellrowborder" valign="top" width="12.38123812381238%" headers="mcps1.2.4.1.1 "><p id="p154591441132214"><a name="p154591441132214"></a><a name="p154591441132214"></a>efc</p>
+<tr id="row2918153732017"><td class="cellrowborder" valign="top" width="12.04120412041204%" headers="mcps1.1.4.1.1 "><p id="p598512211214"><a name="p598512211214"></a><a name="p598512211214"></a>文档</p>
 </td>
-<td class="cellrowborder" valign="top" width="26.512651265126514%" headers="mcps1.2.4.1.2 "><p id="p114591741162217"><a name="p114591741162217"></a><a name="p114591741162217"></a>在构建索引时，每个节点的候选邻居数量。</p>
+<td class="cellrowborder" valign="top" width="16.67166716671667%" headers="mcps1.1.4.1.2 "><p id="p17918337172020"><a name="p17918337172020"></a><a name="p17918337172020"></a>快速入门</p>
 </td>
-<td class="cellrowborder" valign="top" width="61.106110611061105%" headers="mcps1.2.4.1.3 "><p id="p245916419226"><a name="p245916419226"></a><a name="p245916419226"></a>较小的值可以加快索引构建速度，但可能会降低索引质量；较大的值可以提高索引的质量，但会增加索引构建时间。</p>
+<td class="cellrowborder" valign="top" width="71.28712871287128%" headers="mcps1.1.4.1.3 "><p id="p15918183742018"><a name="p15918183742018"></a><a name="p15918183742018"></a>提供hnswlib部署方法和验证性能与功能的快速入门指导。</p>
+</td>
+</tr>
+<tr id="row1491853716207"><td class="cellrowborder" valign="top" width="12.04120412041204%" headers="mcps1.1.4.1.1 "><p id="p3615192392120"><a name="p3615192392120"></a><a name="p3615192392120"></a>文档</p>
+</td>
+<td class="cellrowborder" valign="top" width="16.67166716671667%" headers="mcps1.1.4.1.2 "><p id="p191833772015"><a name="p191833772015"></a><a name="p191833772015"></a>安装指南</p>
+</td>
+<td class="cellrowborder" valign="top" width="71.28712871287128%" headers="mcps1.1.4.1.3 "><p id="p091873712013"><a name="p091873712013"></a><a name="p091873712013"></a>提供hnswlib源码编译安装方法的详细指导。</p>
+</td>
+</tr>
+<tr id="row109181737112010"><td class="cellrowborder" valign="top" width="12.04120412041204%" headers="mcps1.1.4.1.1 "><p id="p6213152432115"><a name="p6213152432115"></a><a name="p6213152432115"></a>文档</p>
+</td>
+<td class="cellrowborder" valign="top" width="16.67166716671667%" headers="mcps1.1.4.1.2 "><p id="p5918537142018"><a name="p5918537142018"></a><a name="p5918537142018"></a>最佳实践</p>
+</td>
+<td class="cellrowborder" valign="top" width="71.28712871287128%" headers="mcps1.1.4.1.3 "><p id="p991893772013"><a name="p991893772013"></a><a name="p991893772013"></a>提供hnswlib的使用实践案例。</p>
+</td>
+</tr>
+<tr id="row169181237152012"><td class="cellrowborder" valign="top" width="12.04120412041204%" headers="mcps1.1.4.1.1 "><p id="p169181237152012"><a name="p169181237152012"></a><a name="p169181237152012"></a>文档</p>
+</td>
+<td class="cellrowborder" valign="top" width="16.67166716671667%" headers="mcps1.1.4.1.2 "><p id="p19181237162012"><a name="p19181237162012"></a><a name="p19181237162012"></a>API参考</p>
+<td class="cellrowborder" valign="top" width="71.28712871287128%" headers="mcps1.1.4.1.3 "><p id="p991893772014"><a name="p991893772014"></a><a name="p991893772014"></a>提供hnswlib的API接口定义和接口说明。</p>
+</td>
+</tr>
+<tr id="row169181237152013"><td class="cellrowborder" valign="top" width="12.04120412041204%" headers="mcps1.1.4.1.1 "><p id="p169181237152013"><a name="p169181237152013"></a><a name="p169181237152013"></a>文档</p>
+</td>
+<td class="cellrowborder" valign="top" width="16.67166716671667%" headers="mcps1.1.4.1.2 "><p id="p19181237162013"><a name="p19181237162013"></a><a name="p19181237162013"></a>特性介绍</p>
+<td class="cellrowborder" valign="top" width="71.28712871287128%" headers="mcps1.1.4.1.3 "><p id="p991893772015"><a name="p991893772015"></a><a name="p991893772015"></a>提供hnswlib的优化特性介绍。</p>
 </td>
 </tr>
 </tbody>
 </table>
 
->![](public_sys-resources/icon-note.gif) **说明：** 
->在**save\_or\_load = save**模式下进行上述参数调优，构建索引时建议使用单NUMA，调优目标为保证召回率大于0.99的情况下，寻找qps最高的参数组合。
-
-## UT测试（可选）<a name="ZH-CN_TOPIC_0000002508594139"></a>
-
-执行下方指令，用于看护编译及运行环境是否正常，算法功能是否正确。
-
-1.  创建UT测试运行脚本。
-    ```
-    cd /path/to/hnswlib
-    vim run.sh
-    ```
-    run.sh脚本内容如下：
-    ```
-    rm -rf build
-    mkdir build
-    cd build
-    cmake ..
-    make
-
-    ./distance_calculation_neon_test
-    ```
-    粘贴上述内容至脚本后，按ESC，输入":wq"后回车，保存文件并退出。
-
-2.  运行UT测试。
-    ```
-    sh run.sh
-    ```
-
-# 贡献指南<a name="ZH-CN_TOPIC_0000002508700579"></a>
-
-如果使用过程中有任何问题，或者需要反馈特性需求和bug报告，可以提交issues联系我们，具体贡献方法可参考[这里](https://gitcode.com/boostkit/community/blob/master/docs/contributor/contributing.md)。
-
-# 免责声明<a name="ZH-CN_TOPIC_0000002476740608"></a>
+## 免责声明<a name="ZH-CN_TOPIC_0000002520444912"></a>
 
 此代码仓计划参与hnswlib开源组件，仅作hnswlib适配ARM平台以及提供FP16接口实现，编码风格遵照原生开源软件，继承原生开源软件安全设计，不破坏原生开源软件设计及编码风格和方式，软件的任何漏洞与安全问题，均由相应的上游社区根据其漏洞和安全响应机制解决。请密切关注上游社区发布的通知和版本更新。鲲鹏计算社区对软件的漏洞及安全问题不承担任何责任。
 
-# 许可证书<a name="ZH-CN_TOPIC_0000002476580620"></a>
+## License<a name="ZH-CN_TOPIC_0000002551484917"></a>
 
 hnswlib采用Apache 2.0 License许可证授权，支持修改代码和再开源。
+
+## 贡献声明<a name="ZH-CN_TOPIC_0000002520604914"></a>
+
+欢迎大家为社区做贡献，如果使用过程中有任何问题/建议，或者需要反馈特性需求和bug报告，可以提交[Issues](https://gitcode.com/boostkit/community/blob/master/docs/contributor/issue-submit.md)联系我们，具体贡献方法可参考[这里](https://gitcode.com/boostkit/community/blob/master/docs/contributor/contributing.md)。同时也欢迎大家在[讨论专区](https://gitcode.com/boostkit/community/discussions)展开讨论交流。感谢您的支持。
+
+## 致谢<a name="ZH-CN_TOPIC_0000002553554263"></a>
+
+hnswlib由华为公司的下列部门联合贡献：
+
+-   鲲鹏计算Boostkit开发部
+
+感谢来自社区的每一个PR，欢迎贡献hnswlib！
 
