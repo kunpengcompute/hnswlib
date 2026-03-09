@@ -8,73 +8,51 @@
 
 **表 1** hnswlib已验证环境<a id="hnswlib已验证环境"></a>
 
-<a name="table4692134313211"></a>
-<table><thead align="left"><tr id="row1169294312212"><th class="cellrowborder" valign="top" width="9.219078092190781%" id="mcps1.2.8.1.1"><p id="p116921643172119"><a name="p116921643172119"></a><a name="p116921643172119"></a>算法</p>
+<a name="table59918346913"></a>
+<table><thead align="left"><tr id="zh-cn_topic_0000002483307829_row1169294312212"><th class="cellrowborder" valign="top" width="9.219078092190781%" id="mcps1.2.8.1.1"><p id="zh-cn_topic_0000002483307829_p116921643172119"><a name="zh-cn_topic_0000002483307829_p116921643172119"></a><a name="zh-cn_topic_0000002483307829_p116921643172119"></a>算法</p>
 </th>
-<th class="cellrowborder" valign="top" width="13.0986901309869%" id="mcps1.2.8.1.2"><p id="p863511211788"><a name="p863511211788"></a><a name="p863511211788"></a>包类型</p>
+<th class="cellrowborder" valign="top" width="13.0986901309869%" id="mcps1.2.8.1.2"><p id="zh-cn_topic_0000002483307829_p863511211788"><a name="zh-cn_topic_0000002483307829_p863511211788"></a><a name="zh-cn_topic_0000002483307829_p863511211788"></a>包类型</p>
 </th>
-<th class="cellrowborder" valign="top" width="16.93830616938306%" id="mcps1.2.8.1.3"><p id="p12692144313211"><a name="p12692144313211"></a><a name="p12692144313211"></a>操作系统</p>
+<th class="cellrowborder" valign="top" width="16.93830616938306%" id="mcps1.2.8.1.3"><p id="zh-cn_topic_0000002483307829_p12692144313211"><a name="zh-cn_topic_0000002483307829_p12692144313211"></a><a name="zh-cn_topic_0000002483307829_p12692144313211"></a>操作系统</p>
 </th>
-<th class="cellrowborder" valign="top" width="15.468453154684534%" id="mcps1.2.8.1.4"><p id="p06926438214"><a name="p06926438214"></a><a name="p06926438214"></a>CPU类型</p>
+<th class="cellrowborder" valign="top" width="15.468453154684534%" id="mcps1.2.8.1.4"><p id="zh-cn_topic_0000002483307829_p06926438214"><a name="zh-cn_topic_0000002483307829_p06926438214"></a><a name="zh-cn_topic_0000002483307829_p06926438214"></a>CPU类型</p>
 </th>
-<th class="cellrowborder" valign="top" width="10.63893610638936%" id="mcps1.2.8.1.5"><p id="p269284310216"><a name="p269284310216"></a><a name="p269284310216"></a>内存</p>
+<th class="cellrowborder" valign="top" width="10.63893610638936%" id="mcps1.2.8.1.5"><p id="zh-cn_topic_0000002483307829_p269284310216"><a name="zh-cn_topic_0000002483307829_p269284310216"></a><a name="zh-cn_topic_0000002483307829_p269284310216"></a>内存</p>
 </th>
-<th class="cellrowborder" valign="top" width="13.468653134686532%" id="mcps1.2.8.1.6"><p id="p196922434215"><a name="p196922434215"></a><a name="p196922434215"></a>编译器</p>
+<th class="cellrowborder" valign="top" width="13.468653134686532%" id="mcps1.2.8.1.6"><p id="zh-cn_topic_0000002483307829_p196922434215"><a name="zh-cn_topic_0000002483307829_p196922434215"></a><a name="zh-cn_topic_0000002483307829_p196922434215"></a>编译器</p>
 </th>
-<th class="cellrowborder" valign="top" width="21.16788321167883%" id="mcps1.2.8.1.7"><p id="p1769219435210"><a name="p1769219435210"></a><a name="p1769219435210"></a>其他</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row1326345193910"><td class="cellrowborder" valign="top" width="9.219078092190781%" headers="mcps1.2.8.1.1 "><p id="p1922431816391"><a name="p1922431816391"></a><a name="p1922431816391"></a>hnswlib</p>
-</td>
-<td class="cellrowborder" valign="top" width="13.0986901309869%" headers="mcps1.2.8.1.2 "><p id="p5224111815393"><a name="p5224111815393"></a><a name="p5224111815393"></a>源码包</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.93830616938306%" headers="mcps1.2.8.1.3 "><p id="p2225161819395"><a name="p2225161819395"></a><a name="p2225161819395"></a>openEuler 22.03 LTS SP3</p>
-</td>
-<td class="cellrowborder" valign="top" width="15.468453154684534%" headers="mcps1.2.8.1.4 "><p id="p1178432114216"><a name="p1178432114216"></a><a name="p1178432114216"></a>鲲鹏920 7282C处理器</p>
-</td>
-<td class="cellrowborder" valign="top" width="10.63893610638936%" headers="mcps1.2.8.1.5 "><p id="p20325717499"><a name="p20325717499"></a><a name="p20325717499"></a>16*32GB</p>
-</td>
-<td class="cellrowborder" valign="top" width="13.468653134686532%" headers="mcps1.2.8.1.6 "><p id="p13225618153916"><a name="p13225618153916"></a><a name="p13225618153916"></a>GCC 12.3.1</p>
-</td>
-<td class="cellrowborder" valign="top" width="21.16788321167883%" headers="mcps1.2.8.1.7 "><p id="p1031335541614"><a name="p1031335541614"></a><a name="p1031335541614"></a>CMake&gt;=3.22.0</p>
-</td>
-</tr>
-</tbody>
-</table>
-
-**表 2** hnswlib已验证环境<a id="hnswlib已验证环境_1"></a>
-
-<a name="table09590142055"></a>
-<table><thead align="left"><tr id="row11959514551"><th class="cellrowborder" valign="top" width="9.219078092190781%" id="mcps1.2.8.1.1"><p id="p9959191410518"><a name="p9959191410518"></a><a name="p9959191410518"></a>算法</p>
-</th>
-<th class="cellrowborder" valign="top" width="14.028597140285973%" id="mcps1.2.8.1.2"><p id="p1295918146511"><a name="p1295918146511"></a><a name="p1295918146511"></a>包类型</p>
-</th>
-<th class="cellrowborder" valign="top" width="16.008399160083993%" id="mcps1.2.8.1.3"><p id="p109591714153"><a name="p109591714153"></a><a name="p109591714153"></a>操作系统</p>
-</th>
-<th class="cellrowborder" valign="top" width="15.468453154684534%" id="mcps1.2.8.1.4"><p id="p795901410513"><a name="p795901410513"></a><a name="p795901410513"></a>CPU类型</p>
-</th>
-<th class="cellrowborder" valign="top" width="10.63893610638936%" id="mcps1.2.8.1.5"><p id="p8959314652"><a name="p8959314652"></a><a name="p8959314652"></a>内存</p>
-</th>
-<th class="cellrowborder" valign="top" width="13.468653134686532%" id="mcps1.2.8.1.6"><p id="p119593143519"><a name="p119593143519"></a><a name="p119593143519"></a>编译器</p>
-</th>
-<th class="cellrowborder" valign="top" width="21.16788321167883%" id="mcps1.2.8.1.7"><p id="p15959114856"><a name="p15959114856"></a><a name="p15959114856"></a>其他</p>
+<th class="cellrowborder" valign="top" width="21.16788321167883%" id="mcps1.2.8.1.7"><p id="zh-cn_topic_0000002483307829_p1769219435210"><a name="zh-cn_topic_0000002483307829_p1769219435210"></a><a name="zh-cn_topic_0000002483307829_p1769219435210"></a>其他</p>
 </th>
 </tr>
 </thead>
-<tbody><tr id="row3961151410518"><td class="cellrowborder" valign="top" width="9.219078092190781%" headers="mcps1.2.8.1.1 "><p id="p3961814659"><a name="p3961814659"></a><a name="p3961814659"></a>hnswlib</p>
+<tbody><tr id="zh-cn_topic_0000002483307829_row1326345193910"><td class="cellrowborder" valign="top" width="9.219078092190781%" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002483307829_p1922431816391"><a name="zh-cn_topic_0000002483307829_p1922431816391"></a><a name="zh-cn_topic_0000002483307829_p1922431816391"></a>hnswlib</p>
 </td>
-<td class="cellrowborder" valign="top" width="14.028597140285973%" headers="mcps1.2.8.1.2 "><p id="p209611914650"><a name="p209611914650"></a><a name="p209611914650"></a>源码包</p>
+<td class="cellrowborder" valign="top" width="13.0986901309869%" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002483307829_p5224111815393"><a name="zh-cn_topic_0000002483307829_p5224111815393"></a><a name="zh-cn_topic_0000002483307829_p5224111815393"></a>源码包</p>
 </td>
-<td class="cellrowborder" valign="top" width="16.008399160083993%" headers="mcps1.2.8.1.3 "><p id="p396116141055"><a name="p396116141055"></a><a name="p396116141055"></a>openEuler 24.03 LTS SP3</p>
+<td class="cellrowborder" valign="top" width="16.93830616938306%" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002483307829_p2225161819395"><a name="zh-cn_topic_0000002483307829_p2225161819395"></a><a name="zh-cn_topic_0000002483307829_p2225161819395"></a>openEuler 22.03 LTS SP3</p>
 </td>
-<td class="cellrowborder" valign="top" width="15.468453154684534%" headers="mcps1.2.8.1.4 "><p id="p1696113141356"><a name="p1696113141356"></a><a name="p1696113141356"></a>鲲鹏950 7592C处理器</p>
+<td class="cellrowborder" valign="top" width="15.468453154684534%" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002483307829_p1178432114216"><a name="zh-cn_topic_0000002483307829_p1178432114216"></a><a name="zh-cn_topic_0000002483307829_p1178432114216"></a>鲲鹏920 7282C处理器</p>
 </td>
-<td class="cellrowborder" valign="top" width="10.63893610638936%" headers="mcps1.2.8.1.5 "><p id="p179617141654"><a name="p179617141654"></a><a name="p179617141654"></a>24*64GB</p>
+<td class="cellrowborder" valign="top" width="10.63893610638936%" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002483307829_p20325717499"><a name="zh-cn_topic_0000002483307829_p20325717499"></a><a name="zh-cn_topic_0000002483307829_p20325717499"></a>16 * 32GB</p>
 </td>
-<td class="cellrowborder" valign="top" width="13.468653134686532%" headers="mcps1.2.8.1.6 "><p id="p996118141510"><a name="p996118141510"></a><a name="p996118141510"></a>GCC 12.3.1</p>
+<td class="cellrowborder" valign="top" width="13.468653134686532%" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002483307829_p13225618153916"><a name="zh-cn_topic_0000002483307829_p13225618153916"></a><a name="zh-cn_topic_0000002483307829_p13225618153916"></a>GCC 12.3.1</p>
 </td>
-<td class="cellrowborder" valign="top" width="21.16788321167883%" headers="mcps1.2.8.1.7 "><p id="p139618141551"><a name="p139618141551"></a><a name="p139618141551"></a>CMake&gt;=3.22.0</p>
+<td class="cellrowborder" valign="top" width="21.16788321167883%" headers="mcps1.2.8.1.7 "><p id="zh-cn_topic_0000002483307829_p1031335541614"><a name="zh-cn_topic_0000002483307829_p1031335541614"></a><a name="zh-cn_topic_0000002483307829_p1031335541614"></a>CMake&gt;=3.22.0</p>
+</td>
+</tr>
+<tr id="zh-cn_topic_0000002483307829_row3961151410518"><td class="cellrowborder" valign="top" width="9.219078092190781%" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002483307829_p3961814659"><a name="zh-cn_topic_0000002483307829_p3961814659"></a><a name="zh-cn_topic_0000002483307829_p3961814659"></a>hnswlib</p>
+</td>
+<td class="cellrowborder" valign="top" width="13.0986901309869%" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002483307829_p209611914650"><a name="zh-cn_topic_0000002483307829_p209611914650"></a><a name="zh-cn_topic_0000002483307829_p209611914650"></a>源码包</p>
+</td>
+<td class="cellrowborder" valign="top" width="16.93830616938306%" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002483307829_p396116141055"><a name="zh-cn_topic_0000002483307829_p396116141055"></a><a name="zh-cn_topic_0000002483307829_p396116141055"></a>openEuler 24.03 LTS SP3</p>
+</td>
+<td class="cellrowborder" valign="top" width="15.468453154684534%" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002483307829_p1696113141356"><a name="zh-cn_topic_0000002483307829_p1696113141356"></a><a name="zh-cn_topic_0000002483307829_p1696113141356"></a>鲲鹏950 7592C处理器</p>
+</td>
+<td class="cellrowborder" valign="top" width="10.63893610638936%" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002483307829_p179617141654"><a name="zh-cn_topic_0000002483307829_p179617141654"></a><a name="zh-cn_topic_0000002483307829_p179617141654"></a>24 * 64GB</p>
+</td>
+<td class="cellrowborder" valign="top" width="13.468653134686532%" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002483307829_p996118141510"><a name="zh-cn_topic_0000002483307829_p996118141510"></a><a name="zh-cn_topic_0000002483307829_p996118141510"></a>GCC 12.3.1</p>
+</td>
+<td class="cellrowborder" valign="top" width="21.16788321167883%" headers="mcps1.2.8.1.7 "><p id="zh-cn_topic_0000002483307829_p139618141551"><a name="zh-cn_topic_0000002483307829_p139618141551"></a><a name="zh-cn_topic_0000002483307829_p139618141551"></a>CMake&gt;=3.22.0</p>
 </td>
 </tr>
 </tbody>
@@ -83,7 +61,7 @@
 
 ### 编译安装<a name="ZH-CN_TOPIC_0000002549877841"></a>
 
-从GitHub和GitCode获取hnswlib开源代码和hnswlib补丁，应用补丁。
+从GitHub下载hnswlib开源代码，从GitCode下载hnswlib补丁代码，应用补丁。
 
 1. 获取开源代码，假设安装路径为“/path/to“。
 

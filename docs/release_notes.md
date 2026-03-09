@@ -60,33 +60,11 @@
 <td class="cellrowborder" valign="top" width="21.16788321167883%" headers="mcps1.2.8.1.7 "><p id="zh-cn_topic_0000002483307829_p1031335541614"><a name="zh-cn_topic_0000002483307829_p1031335541614"></a><a name="zh-cn_topic_0000002483307829_p1031335541614"></a>CMake&gt;=3.22.0</p>
 </td>
 </tr>
-</tbody>
-</table>
-
-**表 2** hnswlib已验证环境<a id="hnswlib已验证环境_1"></a>
-
-<a name="table46801126165816"></a>
-<table><thead align="left"><tr id="zh-cn_topic_0000002483307829_row11959514551"><th class="cellrowborder" valign="top" width="9.219078092190781%" id="mcps1.2.8.1.1"><p id="zh-cn_topic_0000002483307829_p9959191410518"><a name="zh-cn_topic_0000002483307829_p9959191410518"></a><a name="zh-cn_topic_0000002483307829_p9959191410518"></a>算法</p>
-</th>
-<th class="cellrowborder" valign="top" width="14.028597140285973%" id="mcps1.2.8.1.2"><p id="zh-cn_topic_0000002483307829_p1295918146511"><a name="zh-cn_topic_0000002483307829_p1295918146511"></a><a name="zh-cn_topic_0000002483307829_p1295918146511"></a>包类型</p>
-</th>
-<th class="cellrowborder" valign="top" width="16.008399160083993%" id="mcps1.2.8.1.3"><p id="zh-cn_topic_0000002483307829_p109591714153"><a name="zh-cn_topic_0000002483307829_p109591714153"></a><a name="zh-cn_topic_0000002483307829_p109591714153"></a>操作系统</p>
-</th>
-<th class="cellrowborder" valign="top" width="15.468453154684534%" id="mcps1.2.8.1.4"><p id="zh-cn_topic_0000002483307829_p795901410513"><a name="zh-cn_topic_0000002483307829_p795901410513"></a><a name="zh-cn_topic_0000002483307829_p795901410513"></a>CPU类型</p>
-</th>
-<th class="cellrowborder" valign="top" width="10.63893610638936%" id="mcps1.2.8.1.5"><p id="zh-cn_topic_0000002483307829_p8959314652"><a name="zh-cn_topic_0000002483307829_p8959314652"></a><a name="zh-cn_topic_0000002483307829_p8959314652"></a>内存</p>
-</th>
-<th class="cellrowborder" valign="top" width="13.468653134686532%" id="mcps1.2.8.1.6"><p id="zh-cn_topic_0000002483307829_p119593143519"><a name="zh-cn_topic_0000002483307829_p119593143519"></a><a name="zh-cn_topic_0000002483307829_p119593143519"></a>编译器</p>
-</th>
-<th class="cellrowborder" valign="top" width="21.16788321167883%" id="mcps1.2.8.1.7"><p id="zh-cn_topic_0000002483307829_p15959114856"><a name="zh-cn_topic_0000002483307829_p15959114856"></a><a name="zh-cn_topic_0000002483307829_p15959114856"></a>其他</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="zh-cn_topic_0000002483307829_row3961151410518"><td class="cellrowborder" valign="top" width="9.219078092190781%" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002483307829_p3961814659"><a name="zh-cn_topic_0000002483307829_p3961814659"></a><a name="zh-cn_topic_0000002483307829_p3961814659"></a>hnswlib</p>
+<tr id="zh-cn_topic_0000002483307829_row3961151410518"><td class="cellrowborder" valign="top" width="9.219078092190781%" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002483307829_p3961814659"><a name="zh-cn_topic_0000002483307829_p3961814659"></a><a name="zh-cn_topic_0000002483307829_p3961814659"></a>hnswlib</p>
 </td>
-<td class="cellrowborder" valign="top" width="14.028597140285973%" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002483307829_p209611914650"><a name="zh-cn_topic_0000002483307829_p209611914650"></a><a name="zh-cn_topic_0000002483307829_p209611914650"></a>源码包</p>
+<td class="cellrowborder" valign="top" width="13.0986901309869%" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002483307829_p209611914650"><a name="zh-cn_topic_0000002483307829_p209611914650"></a><a name="zh-cn_topic_0000002483307829_p209611914650"></a>源码包</p>
 </td>
-<td class="cellrowborder" valign="top" width="16.008399160083993%" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002483307829_p396116141055"><a name="zh-cn_topic_0000002483307829_p396116141055"></a><a name="zh-cn_topic_0000002483307829_p396116141055"></a>openEuler 24.03 LTS SP3</p>
+<td class="cellrowborder" valign="top" width="16.93830616938306%" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002483307829_p396116141055"><a name="zh-cn_topic_0000002483307829_p396116141055"></a><a name="zh-cn_topic_0000002483307829_p396116141055"></a>openEuler 24.03 LTS SP3</p>
 </td>
 <td class="cellrowborder" valign="top" width="15.468453154684534%" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002483307829_p1696113141356"><a name="zh-cn_topic_0000002483307829_p1696113141356"></a><a name="zh-cn_topic_0000002483307829_p1696113141356"></a>鲲鹏950 7592C处理器</p>
 </td>
@@ -160,7 +138,7 @@
 
 ### 使用注意事项<a name="ZH-CN_TOPIC_0000002518233480"></a>
 
-请参见《hnswliban安装指南》。
+请参见[《hnswlib安装指南》](./installation_guide.md)。
 
 
 
@@ -205,25 +183,46 @@
 </th>
 </tr>
 </thead>
-<tbody><tr id="row19094280"><td class="cellrowborder" valign="top" width="45.019999999999996%" headers="mcps1.1.4.1.1 "><p id="p1341193722116"><a name="p1341193722116"></a><a name="p1341193722116"></a>《Kunpeng BoostKit <span id="text551617576473"><a name="text551617576473"></a><a name="text551617576473"></a>25.3.0</span> hnswlib 版本说明书》</p>
+<tbody><tr id="row19094280"><td class="cellrowborder" valign="top" width="45.019999999999996%" headers="mcps1.1.4.1.1 "><p id="p1341193722116"><a name="p1341193722116"></a><a name="p1341193722116"></a><a href="release_notes.md">《Kunpeng BoostKit 25.3.0 hnswlib 版本说明书》</p>
 </td>
 <td class="cellrowborder" valign="top" width="38.019999999999996%" headers="mcps1.1.4.1.2 "><p id="p2042183752117"><a name="p2042183752117"></a><a name="p2042183752117"></a>本文档提供hnswlib的版本发布信息。</p>
 </td>
 <td class="cellrowborder" valign="top" width="16.96%" headers="mcps1.1.4.1.3 "><p id="p548410506233"><a name="p548410506233"></a><a name="p548410506233"></a>开源仓</p>
 </td>
 </tr>
-<tr id="row14206105162520"><td class="cellrowborder" valign="top" width="45.019999999999996%" headers="mcps1.1.4.1.1 "><p id="p6717161182512"><a name="p6717161182512"></a><a name="p6717161182512"></a>《Kunpeng BoostKit <span id="text1871751115251"><a name="text1871751115251"></a><a name="text1871751115251"></a>25.3.0</span> hnswlib 快速入门》</p>
+<tr id="row14206105162520"><td class="cellrowborder" valign="top" width="45.019999999999996%" headers="mcps1.1.4.1.1 "><p id="p6717161182512"><a name="p6717161182512"></a><a name="p6717161182512"></a><a href="quick_start.md">《Kunpeng BoostKit 25.3.0 hnswlib 快速入门》</p>
 </td>
 <td class="cellrowborder" valign="top" width="38.019999999999996%" headers="mcps1.1.4.1.2 "><p id="p471712119258"><a name="p471712119258"></a><a name="p471712119258"></a>本文档提供hnswlib的快速上手指导。</p>
 </td>
 <td class="cellrowborder" valign="top" width="16.96%" headers="mcps1.1.4.1.3 "><p id="p1571751182516"><a name="p1571751182516"></a><a name="p1571751182516"></a>开源仓</p>
 </td>
 </tr>
-<tr id="row1941037152117"><td class="cellrowborder" valign="top" width="45.019999999999996%" headers="mcps1.1.4.1.1 "><p id="p5143115122016"><a name="p5143115122016"></a><a name="p5143115122016"></a>《Kunpeng BoostKit <span id="text154911622485"><a name="text154911622485"></a><a name="text154911622485"></a>25.3.0</span> hnswlib 安装指南》</p>
+<tr id="row1941037152117"><td class="cellrowborder" valign="top" width="45.019999999999996%" headers="mcps1.1.4.1.1 "><p id="p5143115122016"><a name="p5143115122016"></a><a name="p5143115122016"></a><a href="installation_guide.md">《Kunpeng BoostKit 25.3.0 hnswlib 安装指南》</p>
 </td>
 <td class="cellrowborder" valign="top" width="38.019999999999996%" headers="mcps1.1.4.1.2 "><p id="p1914345202019"><a name="p1914345202019"></a><a name="p1914345202019"></a>本文档提供hnswlib安装、部署与开发指导。</p>
 </td>
 <td class="cellrowborder" valign="top" width="16.96%" headers="mcps1.1.4.1.3 "><p id="p84831950142316"><a name="p84831950142316"></a><a name="p84831950142316"></a>开源仓</p>
+</td>
+</tr>
+<tr id="row1022037152117"><td class="cellrowborder" valign="top" width="45.019999999999996%" headers="mcps1.1.4.1.1 "><p id="p10143115122016"><a name="p10143115122016"></a><a name="p10143115122016"></a><a href="api_reference.md">《Kunpeng BoostKit 25.3.0 hnswlib API参考》</p>
+</td>
+<td class="cellrowborder" valign="top" width="38.019999999999996%" headers="mcps1.1.4.1.2 "><p id="p101914345202019"><a name="p101914345202019"></a><a name="p101914345202019"></a>本文档提供hnswlib的API说明和使用示例。</p>
+</td>
+<td class="cellrowborder" valign="top" width="16.96%" headers="mcps1.1.4.1.3 "><p id="p1084831950142316"><a name="p1084831950142316"></a><a name="p1084831950142316"></a>开源仓</p>
+</td>
+</tr>
+<tr id="row2022037152117"><td class="cellrowborder" valign="top" width="45.019999999999996%" headers="mcps1.1.4.1.1 "><p id="p20143115122016"><a name="p20143115122016"></a><a name="p20143115122016"></a><a href="best_practices.md">《Kunpeng BoostKit 25.3.0 hnswlib 最佳实践》</p>
+</td>
+<td class="cellrowborder" valign="top" width="38.019999999999996%" headers="mcps1.1.4.1.2 "><p id="p201914345202019"><a name="p201914345202019"></a><a name="p201914345202019"></a>本文档提供hnswlib的测试方法和性能优化建议。</p>
+</td>
+<td class="cellrowborder" valign="top" width="16.96%" headers="mcps1.1.4.1.3 "><p id="p2084831950142316"><a name="p2084831950142316"></a><a name="p2084831950142316"></a>开源仓</p>
+</td>
+</tr>
+<tr id="row3022037152117"><td class="cellrowborder" valign="top" width="45.019999999999996%" headers="mcps1.1.4.1.1 "><p id="p30143115122016"><a name="p30143115122016"></a><a name="p30143115122016"></a><a href="feature_introduction.md">《Kunpeng BoostKit 25.3.0 hnswlib 特性介绍》</p>
+</td>
+<td class="cellrowborder" valign="top" width="38.019999999999996%" headers="mcps1.1.4.1.2 "><p id="p301914345202019"><a name="p301914345202019"></a><a name="p301914345202019"></a>本文档提供hnswlib的优化特性介绍。</p>
+</td>
+<td class="cellrowborder" valign="top" width="16.96%" headers="mcps1.1.4.1.3 "><p id="p3084831950142316"><a name="p3084831950142316"></a><a name="p3084831950142316"></a>开源仓</p>
 </td>
 </tr>
 </tbody>
@@ -233,6 +232,3 @@
 ### 获取文档的方法<a name="ZH-CN_TOPIC_0000002549753251"></a>
 
 您可以通过访问[开源仓](https://gitcode.com/boostkit/hnswlib)浏览和获取相关文档。
-
-
-

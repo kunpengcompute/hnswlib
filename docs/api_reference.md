@@ -128,20 +128,20 @@ space = std::make_unique<hnswlib::IPSpacePh>(dim); // 构造方法二
 ```cpp
 // 创建新索引
 hnswlib::HierarchicalNSW<float>* index = new hnswlib::HierarchicalNSW<float>(
-    &space,          // 空间对象
-    max_elements,    // 最大元素数量
-    M = 16,          // 每个节点的最大连接数
-    ef_construction = 200,  // 构建时的ef参数
-    random_seed = 100,      // 随机种子
+    &space,                        // 空间对象
+    max_elements,                  // 最大元素数量
+    M = 16,                        // 每个节点的最大连接数
+    ef_construction = 200,         // 构建时的ef参数
+    random_seed = 100,             // 随机种子
     allow_replace_deleted = false  // 是否允许替换已删除元素
 );
 
 // 从文件加载索引
 hnswlib::HierarchicalNSW<float>* index = new hnswlib::HierarchicalNSW<float>(
-    &space,          // 空间对象
-    index_path,      // 索引文件路径
-    nmslib = false,  // 是否为nmslib格式
-    max_elements = 0,  // 可选的新最大元素数量
+    &space,                        // 空间对象
+    index_path,                    // 索引文件路径
+    nmslib = false,                // 是否为nmslib格式
+    max_elements = 0,              // 可选的新最大元素数量
     allow_replace_deleted = false  // 是否允许替换已删除元素
 );
 ```
@@ -163,12 +163,12 @@ void addPoint(const void* data_point, labeltype label, bool replace_deleted = fa
 
 #### searchKnn
 
-执行最近邻搜索，返回最远的k个结果。
+执行最近邻搜索，返回最近的k个结果。
 
 ```cpp
 std::priority_queue<std::pair<float, labeltype>> searchKnn(
-    const void* query_data,  // 查询向量
-    size_t k,               // 搜索最近邻数量
+    const void* query_data,                   // 查询向量
+    size_t k,                                 // 搜索最近邻数量
     BaseFilterFunctor* isIdAllowed = nullptr  // 可选的过滤器
 ) const;
 ```
@@ -182,8 +182,8 @@ std::priority_queue<std::pair<float, labeltype>> searchKnn(
 
 ```cpp
 std::vector<std::pair<float, labeltype>> searchKnnCloserFirst(
-    const void* query_data,  // 查询向量
-    size_t k,               // 搜索最近邻数量
+    const void* query_data,                   // 查询向量
+    size_t k,                                 // 搜索最近邻数量
     BaseFilterFunctor* isIdAllowed = nullptr  // 可选的过滤器
 ) const;
 ```
@@ -270,56 +270,4 @@ void resizeIndex(size_t new_max_elements);
 | 速度 | 快 | 更快（在支持NEON的ARM平台上） |
 | 空间类 | L2Space, InnerProductSpace | L2SpacePh, IPSpacePh |
 | 平台要求 | 无特殊要求 | 仅支持NEON架构 |
-
-
-
-## 编译选项
-
-### 启用NEON和FP16支持
-
-在ARM平台上编译时，需要添加以下编译选项以启用NEON和FP16支持：
-
-```bash
--march=armv8.2-a+dotprod+fp16fml -DUSE_NEON
-```
-
-
-## 性能优化建议
-
-1. **选择合适的数据类型**：在精度要求不高的场景下，优先使用FP16以减少内存占用和提升性能
-2. **调整M参数**：根据向量维度调整M参数，一般维度越高，M参数应越大
-3. **设置合适的ef参数**：
-   - `ef_construction`：构建时使用较大值（如200-800）以获得更好的索引质量
-   - `ef`：查询时根据需要调整，值越大精度越高但速度越慢
-4. **批处理查询**：尽量批量处理查询，减少线程创建开销
-
-## 与原始hnswlib的兼容性
-
-本版本保持了与原始hnswlib API的完全兼容，同时添加了以下新特性：
-
-1. 新增FP16数据类型支持（L2SpacePh、IPSpacePh）
-2. ARM平台上的NEON指令优化
-3. 底库ID重排优化
-4. ARM平台上的预取优化
-
-用户可以无缝迁移现有的hnswlib代码到本版本，并根据需要使用新增的FP16接口和ARM优化特性。
-
-## 故障排除
-
-### FP16接口不可用
-
-如果编译时提示FP16相关的类或方法未定义，请检查：
-
-1. 是否在ARM平台上编译
-2. 是否启用了NEON支持（添加了`-march=armv8.2-a+dotprod+fp16fml -DUSE_NEON`编译选项）
-3. 使用了正确的条件编译（`#ifdef USE_NEON`）
-
-### 性能不佳
-
-如果性能未达到预期，请尝试：
-
-1. 调整M和ef参数
-2. 使用FP16数据类型
-3. 调用AggressiveRenumberInplace方法重排底库ID
-4. 确保编译时启用了所有优化选项（如`-O3`）
 
