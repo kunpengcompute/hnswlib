@@ -58,10 +58,10 @@ hnswlib::L2Space space(dim); // 构造方法一
 space = std::make_unique<hnswlib::L2Space>(dim); // 构造方法二
 ```
 
-**参数**：
+**参数**
 - `dim`: 向量维度
 
-**说明**：
+**说明**
 - 根据向量维度自动选择最优的NEON指令实现（SIMD16、SIMD4或带残差处理的版本）
 - 支持维度为任意大小，内部会自动处理对齐和残差
 
@@ -74,10 +74,10 @@ hnswlib::InnerProductSpace space(dim); // 构造方法一
 space = std::make_unique<hnswlib::InnerProductSpace>(dim); // 构造方法二
 ```
 
-**参数**：
+**参数**
 - `dim`: 向量维度
 
-**说明**：
+**说明**
 - 根据向量维度自动选择最优的NEON指令实现
 - 内积距离定义为 `1.0 - sum(Ai*Bi)`
 
@@ -94,10 +94,10 @@ space = std::make_unique<hnswlib::L2SpacePh>(dim); // 构造方法二
 #endif
 ```
 
-**参数**：
+**参数**
 - `dim`: 向量维度
 
-**说明**：
+**说明**
 - 仅在定义了`USE_NEON`宏时可用
 - 自动选择最优的NEON指令实现
 - 内存占用对比FP32显著减少
@@ -113,10 +113,10 @@ space = std::make_unique<hnswlib::IPSpacePh>(dim); // 构造方法二
 #endif
 ```
 
-**参数**：
+**参数**
 - `dim`: 向量维度
 
-**说明**：
+**说明**
 - 仅在定义了`USE_NEON`宏时可用
 - 自动选择最优的NEON指令实现
 - 内存占用对比FP32显著减少
@@ -156,7 +156,7 @@ hnswlib::HierarchicalNSW<float>* index = new hnswlib::HierarchicalNSW<float>(
 void addPoint(const void* data_point, labeltype label, bool replace_deleted = false);
 ```
 
-**参数**：
+**参数**
 - `data_point`: 指向数据点的指针（FP32或FP16类型，取决于使用的空间类）
 - `label`: 数据点的标签
 - `replace_deleted`: 是否允许替换已删除的元素（需要构造时设置`allow_replace_deleted=true`）
@@ -173,7 +173,7 @@ std::priority_queue<std::pair<float, labeltype>> searchKnn(
 ) const;
 ```
 
-**返回值**：
+**返回值**
 - 优先队列，包含k个最近邻，按距离从远到近排序
 
 #### searchKnnCloserFirst
@@ -188,7 +188,7 @@ std::vector<std::pair<float, labeltype>> searchKnnCloserFirst(
 ) const;
 ```
 
-**返回值**：
+**返回值**
 - 向量，包含k个最近邻，按距离从近到远排序
 
 #### saveIndex
@@ -199,7 +199,7 @@ std::vector<std::pair<float, labeltype>> searchKnnCloserFirst(
 void saveIndex(const std::string& location);
 ```
 
-**参数**：
+**参数**
 - `location`: 保存文件的路径
 
 #### loadIndex
@@ -210,7 +210,7 @@ void saveIndex(const std::string& location);
 void loadIndex(const std::string& location, SpaceInterface<float>* s, size_t max_elements = 0);
 ```
 
-**参数**：
+**参数**
 - `location`: 索引文件路径
 - `s`: 空间对象
 - `max_elements`: 可选的新最大元素数量
@@ -223,7 +223,7 @@ void loadIndex(const std::string& location, SpaceInterface<float>* s, size_t max
 void setEf(size_t ef);
 ```
 
-**参数**：
+**参数**
 - `ef`: 查询时的ef参数值（应大于搜索的k值）
 
 #### markDelete
@@ -234,7 +234,7 @@ void setEf(size_t ef);
 void markDelete(labeltype label);
 ```
 
-**参数**：
+**参数**
 - `label`: 要删除的元素标签
 
 #### unmarkDelete
@@ -245,7 +245,7 @@ void markDelete(labeltype label);
 void unmarkDelete(labeltype label);
 ```
 
-**参数**：
+**参数**
 - `label`: 要取消删除的元素标签
 
 #### resizeIndex
@@ -256,7 +256,7 @@ void unmarkDelete(labeltype label);
 void resizeIndex(size_t new_max_elements);
 ```
 
-**参数**：
+**参数**
 - `new_max_elements`: 新的最大元素数量（必须大于当前元素数量）
 
 

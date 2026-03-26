@@ -1,19 +1,15 @@
-# 安装指南<a name="ZH-CN_TOPIC_0000002552742877"></a>
+# 安装指南
 
-## 编译安装hnswlib<a name="ZH-CN_TOPIC_0000002549877861"></a>
+## 编译安装hnswlib
 
-### 已验证环境<a name="ZH-CN_TOPIC_0000002549757839"></a>
+### 已验证环境
 
 为保证您可以顺利安全地使用hnswlib，请确保所使用的环境信息在已验证环境范围内。
 
 **表 1** hnswlib已验证环境<a id="hnswlib已验证环境"></a>
 
 <a name="table59918346913"></a>
-<table><thead align="left"><tr id="zh-cn_topic_0000002483307829_row1169294312212"><th class="cellrowborder" valign="top" width="9.219078092190781%" id="mcps1.2.8.1.1"><p id="zh-cn_topic_0000002483307829_p116921643172119"><a name="zh-cn_topic_0000002483307829_p116921643172119"></a><a name="zh-cn_topic_0000002483307829_p116921643172119"></a>算法</p>
-</th>
-<th class="cellrowborder" valign="top" width="13.0986901309869%" id="mcps1.2.8.1.2"><p id="zh-cn_topic_0000002483307829_p863511211788"><a name="zh-cn_topic_0000002483307829_p863511211788"></a><a name="zh-cn_topic_0000002483307829_p863511211788"></a>包类型</p>
-</th>
-<th class="cellrowborder" valign="top" width="16.93830616938306%" id="mcps1.2.8.1.3"><p id="zh-cn_topic_0000002483307829_p12692144313211"><a name="zh-cn_topic_0000002483307829_p12692144313211"></a><a name="zh-cn_topic_0000002483307829_p12692144313211"></a>操作系统</p>
+<table><thead align="left"><tr id="zh-cn_topic_0000002483307829_row1169294312212"><th class="cellrowborder" valign="top" width="16.93830616938306%" id="mcps1.2.8.1.3"><p id="zh-cn_topic_0000002483307829_p12692144313211"><a name="zh-cn_topic_0000002483307829_p12692144313211"></a><a name="zh-cn_topic_0000002483307829_p12692144313211"></a>操作系统</p>
 </th>
 <th class="cellrowborder" valign="top" width="15.468453154684534%" id="mcps1.2.8.1.4"><p id="zh-cn_topic_0000002483307829_p06926438214"><a name="zh-cn_topic_0000002483307829_p06926438214"></a><a name="zh-cn_topic_0000002483307829_p06926438214"></a>CPU类型</p>
 </th>
@@ -25,11 +21,7 @@
 </th>
 </tr>
 </thead>
-<tbody><tr id="zh-cn_topic_0000002483307829_row1326345193910"><td class="cellrowborder" valign="top" width="9.219078092190781%" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002483307829_p1922431816391"><a name="zh-cn_topic_0000002483307829_p1922431816391"></a><a name="zh-cn_topic_0000002483307829_p1922431816391"></a>hnswlib</p>
-</td>
-<td class="cellrowborder" valign="top" width="13.0986901309869%" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002483307829_p5224111815393"><a name="zh-cn_topic_0000002483307829_p5224111815393"></a><a name="zh-cn_topic_0000002483307829_p5224111815393"></a>源码包</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.93830616938306%" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002483307829_p2225161819395"><a name="zh-cn_topic_0000002483307829_p2225161819395"></a><a name="zh-cn_topic_0000002483307829_p2225161819395"></a>openEuler 22.03 LTS SP3</p>
+<tbody><tr id="zh-cn_topic_0000002483307829_row1326345193910"><td class="cellrowborder" valign="top" width="16.93830616938306%" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002483307829_p2225161819395"><a name="zh-cn_topic_0000002483307829_p2225161819395"></a><a name="zh-cn_topic_0000002483307829_p2225161819395"></a>openEuler 22.03 LTS SP3</p>
 </td>
 <td class="cellrowborder" valign="top" width="15.468453154684534%" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002483307829_p1178432114216"><a name="zh-cn_topic_0000002483307829_p1178432114216"></a><a name="zh-cn_topic_0000002483307829_p1178432114216"></a>鲲鹏920 7282C处理器</p>
 </td>
@@ -40,11 +32,7 @@
 <td class="cellrowborder" valign="top" width="21.16788321167883%" headers="mcps1.2.8.1.7 "><p id="zh-cn_topic_0000002483307829_p1031335541614"><a name="zh-cn_topic_0000002483307829_p1031335541614"></a><a name="zh-cn_topic_0000002483307829_p1031335541614"></a>CMake&gt;=3.22.0</p>
 </td>
 </tr>
-<tr id="zh-cn_topic_0000002483307829_row3961151410518"><td class="cellrowborder" valign="top" width="9.219078092190781%" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002483307829_p3961814659"><a name="zh-cn_topic_0000002483307829_p3961814659"></a><a name="zh-cn_topic_0000002483307829_p3961814659"></a>hnswlib</p>
-</td>
-<td class="cellrowborder" valign="top" width="13.0986901309869%" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002483307829_p209611914650"><a name="zh-cn_topic_0000002483307829_p209611914650"></a><a name="zh-cn_topic_0000002483307829_p209611914650"></a>源码包</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.93830616938306%" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002483307829_p396116141055"><a name="zh-cn_topic_0000002483307829_p396116141055"></a><a name="zh-cn_topic_0000002483307829_p396116141055"></a>openEuler 24.03 LTS SP3</p>
+<tr id="zh-cn_topic_0000002483307829_row3961151410518"><td class="cellrowborder" valign="top" width="16.93830616938306%" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002483307829_p396116141055"><a name="zh-cn_topic_0000002483307829_p396116141055"></a><a name="zh-cn_topic_0000002483307829_p396116141055"></a>openEuler 24.03 LTS SP3</p>
 </td>
 <td class="cellrowborder" valign="top" width="15.468453154684534%" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002483307829_p1696113141356"><a name="zh-cn_topic_0000002483307829_p1696113141356"></a><a name="zh-cn_topic_0000002483307829_p1696113141356"></a>鲲鹏950 7592C处理器</p>
 </td>
@@ -59,9 +47,9 @@
 </table>
 
 
-### 编译安装<a name="ZH-CN_TOPIC_0000002549877841"></a>
+### 编译安装
 
-从GitHub下载hnswlib开源代码，从GitCode下载hnswlib补丁代码，应用补丁。
+从GitHub下载hnswlib开源代码，然后从GitCode下载hnswlib补丁代码，应用补丁。
 
 1. 获取开源代码，假设安装路径为“/path/to“。
 
@@ -105,7 +93,7 @@
 
 
 
-## 兼容性验证<a name="ZH-CN_TOPIC_0000002518398012"></a>
+## 兼容性验证
 
 本章节提供在鲲鹏平台进行开源hnswlib兼容性验证的方法，包括获取hnswlib开源代码，编写测试脚本，执行测试脚本。
 

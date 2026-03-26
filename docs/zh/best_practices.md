@@ -1,12 +1,12 @@
-# 最佳实践<a name="ZH-CN_TOPIC_0000002521702931"></a>
+# 最佳实践
 
-本节介绍在鲲鹏平台测试优化后的hnswlib的方法。本节依赖鲲鹏的优化补丁文件0001-hnswlib_0.8.0-optimize-fp32_fp16_dis_idsort_prefetch.patch。
+本节介绍在鲲鹏平台测试优化后的hnswlib的方法，依赖鲲鹏的优化补丁文件0001-hnswlib_0.8.0-optimize-fp32_fp16_dis_idsort_prefetch.patch。
 
 **优化后的hnswlib测试示例<a name="section18521028313"></a>**
 
 下方使用示例以使用fashion-mnist-784-euclidean.hdf5数据集为例。
 
-1.  按照[安装指南](installation_guide.md)安装hnswlib。
+1.  请参见[安装指南](./installation_guide.md)安装hnswlib。
 
 2.  获取测试程序。假设路径为"/path/to/sra_test"。
 
