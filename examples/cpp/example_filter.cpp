@@ -1,4 +1,4 @@
-#include "hnswlib/hnswlib.h"
+#include "../../hnswlib/hnswlib.h"
 
 
 // Filter that allows labels divisible by divisor
@@ -13,7 +13,7 @@ unsigned int divisor = 1;
     }
 };
 
-#ifdef HNSWLIB_ENABLE_FP16
+
 int main() {
     int dim = 16;               // Dimension of the elements
     int max_elements = 10000;   // Maximum number of elements, should be known beforehand
@@ -22,55 +22,8 @@ int main() {
     int ef_construction = 200;  // Controls index search speed/build speed tradeoff
 
     // Initing index
-    hnswlib::L2SpaceHalf space(dim);
-    hnswlib::HierarchicalNSWHalf* alg_hnsw = new hnswlib::HierarchicalNSWHalf(&space, max_elements, M, ef_construction);
-
-    // Generate random data
-    std::mt19937 rng;
-    rng.seed(47);
-    std::uniform_real_distribution<> distrib_real;
-    float* data = new float[dim * max_elements];
-    for (int i = 0; i < dim * max_elements; i++) {
-        data[i] = distrib_real(rng);
-    }
-    float16_t* data_fp16 = new float16_t[dim * max_elements];
-    for (int i = 0; i < dim * max_elements; i++) {
-        data_fp16[i] = static_cast<float16_t>(data[i]);
-    }
-
-    // Add data to index
-    for (int i = 0; i < max_elements; i++) {
-        alg_hnsw->addPoint(data_fp16 + i * dim, i);
-    }
-
-    // Create filter that allows only even labels
-    PickDivisibleIds pickIdsDivisibleByTwo(2);
-
-    // Query the elements for themselves with filter and check returned labels
-    int k = 10;
-    for (int i = 0; i < max_elements; i++) {
-        std::vector<std::pair<float, hnswlib::labeltype>> result = alg_hnsw->searchKnnCloserFirst(data_fp16 + i * dim, k, &pickIdsDivisibleByTwo);
-        for (auto item: result) {
-            if (item.second % 2 == 1) std::cout << "Error: found odd label\n";
-        }
-    }
-
-    delete[] data;
-    delete[] data_fp16;
-    delete alg_hnsw;
-    return 0;
-}
-#else
-int main() {
-    int dim = 16;               // Dimension of the elements
-    int max_elements = 10000;   // Maximum number of elements, should be known beforehand
-    int M = 16;                 // Tightly connected with internal dimensionality of the data
-                                // strongly affects the memory consumption
-    int ef_construction = 200;  // Controls index search speed/build speed tradeoff
-
-    // Initing index
-    hnswlib::L2SpaceF space(dim);
-    hnswlib::HierarchicalNSWFloat* alg_hnsw = new hnswlib::HierarchicalNSWFloat(&space, max_elements, M, ef_construction);
+    hnswlib::L2Space space(dim);
+    hnswlib::HierarchicalNSW<float>* alg_hnsw = new hnswlib::HierarchicalNSW<float>(&space, max_elements, M, ef_construction);
 
     // Generate random data
     std::mt19937 rng;
@@ -102,4 +55,3 @@ int main() {
     delete alg_hnsw;
     return 0;
 }
-#endif

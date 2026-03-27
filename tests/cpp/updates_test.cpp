@@ -1,4 +1,4 @@
-#include "hnswlib/hnswlib.h"
+#include "../../hnswlib/hnswlib.h"
 #include <thread>
 
 
@@ -105,7 +105,7 @@ std::vector<datatype> load_batch(std::string path, int size) {
 
 template <typename d_type>
 static float
-test_approx(std::vector<float> &queries, size_t qsize, hnswlib::HierarchicalNSWFloat &appr_alg, size_t vecdim,
+test_approx(std::vector<float> &queries, size_t qsize, hnswlib::HierarchicalNSW<d_type> &appr_alg, size_t vecdim,
             std::vector<std::unordered_set<hnswlib::labeltype>> &answers, size_t K) {
     size_t correct = 0;
     size_t total = 0;
@@ -129,7 +129,7 @@ static void
 test_vs_recall(
     std::vector<float> &queries,
     size_t qsize,
-    hnswlib::HierarchicalNSWFloat &appr_alg,
+    hnswlib::HierarchicalNSW<float> &appr_alg,
     size_t vecdim,
     std::vector<std::unordered_set<hnswlib::labeltype>> &answers,
     size_t k) {
@@ -212,8 +212,8 @@ int main(int argc, char **argv) {
         printf("Loaded config: N=%d, d_mult=%d, Nq=%d, dim=%d, K=%d\n", N, dummy_data_multiplier, N_queries, d, K);
     }
 
-    hnswlib::L2SpaceF l2space(d);
-    hnswlib::HierarchicalNSWFloat appr_alg(&l2space, N + 1, M, efConstruction);
+    hnswlib::L2Space l2space(d);
+    hnswlib::HierarchicalNSW<float> appr_alg(&l2space, N + 1, M, efConstruction);
 
     std::vector<float> dummy_batch = load_batch<float>(path + "batch_dummy_00.bin", N * d);
 

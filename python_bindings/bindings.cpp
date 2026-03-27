@@ -233,7 +233,7 @@ class Index {
           delete appr_alg;
       }
       appr_alg = new hnswlib::HierarchicalNSW<dist_t>(l2space, path_to_index, false, max_elements, allow_replace_deleted);
-      cur_l = appr_alg->cur_element_count_;
+      cur_l = appr_alg->cur_element_count;
       index_inited = true;
     }
 
@@ -351,11 +351,11 @@ class Index {
     py::dict getAnnData() const { /* WARNING: Index::getAnnData is not thread-safe with Index::addItems */
         std::unique_lock <std::mutex> templock(appr_alg->global);
 
-        size_t level0_npy_size = appr_alg->cur_element_count_ * appr_alg->size_data_per_element_;
+        size_t level0_npy_size = appr_alg->cur_element_count * appr_alg->size_data_per_element_;
         size_t link_npy_size = 0;
-        std::vector<size_t> link_npy_offsets(appr_alg->cur_element_count_);
+        std::vector<size_t> link_npy_offsets(appr_alg->cur_element_count);
 
-        for (size_t i = 0; i < appr_alg->cur_element_count_; i++) {
+        for (size_t i = 0; i < appr_alg->cur_element_count; i++) {
             size_t linkListSize = appr_alg->element_levels_[i] > 0 ? appr_alg->size_links_per_element_ * appr_alg->element_levels_[i] : 0;
             link_npy_offsets[i] = link_npy_size;
             if (linkListSize)
@@ -384,7 +384,7 @@ class Index {
         memcpy(data_level0_npy, appr_alg->data_level0_memory_, level0_npy_size);
         memcpy(element_levels_npy, appr_alg->element_levels_.data(), appr_alg->element_levels_.size() * sizeof(int));
 
-        for (size_t i = 0; i < appr_alg->cur_element_count_; i++) {
+        for (size_t i = 0; i < appr_alg->cur_element_count; i++) {
             size_t linkListSize = appr_alg->element_levels_[i] > 0 ? appr_alg->size_links_per_element_ * appr_alg->element_levels_[i] : 0;
             if (linkListSize) {
                 memcpy(link_list_npy + link_npy_offsets[i], appr_alg->linkLists_[i], linkListSize);
@@ -413,7 +413,7 @@ class Index {
         return py::dict(
             "offset_level0"_a = appr_alg->offsetLevel0_,
             "max_elements"_a = appr_alg->max_elements_,
-            "cur_element_count_"_a = (size_t)appr_alg->cur_element_count_,
+            "cur_element_count"_a = (size_t)appr_alg->cur_element_count,
             "size_data_per_element"_a = appr_alg->size_data_per_element_,
             "label_offset"_a = appr_alg->label_offset_,
             "offset_data"_a = appr_alg->offsetData_,
@@ -503,7 +503,7 @@ class Index {
                 d["M"].cast<size_t>(),
                 d["ef_construction"].cast<size_t>(),
                 new_index->seed);
-            new_index->cur_l = d["cur_element_count_"].cast<size_t>();
+            new_index->cur_l = d["cur_element_count"].cast<size_t>();
         }
 
         new_index->index_inited = index_inited_;
@@ -529,7 +529,7 @@ class Index {
         assert_true(appr_alg->offsetLevel0_ == d["offset_level0"].cast<size_t>(), "Invalid value of offsetLevel0_ ");
         assert_true(appr_alg->max_elements_ == d["max_elements"].cast<size_t>(), "Invalid value of max_elements_ ");
 
-        appr_alg->cur_element_count_ = d["cur_element_count_"].cast<size_t>();
+        appr_alg->cur_element_count = d["cur_element_count"].cast<size_t>();
 
         assert_true(appr_alg->size_data_per_element_ == d["size_data_per_element"].cast<size_t>(), "Invalid value of size_data_per_element_ ");
         assert_true(appr_alg->label_offset_ == d["label_offset"].cast<size_t>(), "Invalid value of label_offset_ ");
@@ -554,7 +554,7 @@ class Index {
         auto data_level0_npy = d["data_level0"].cast<py::array_t < char, py::array::c_style | py::array::forcecast > >();
         auto link_list_npy = d["link_lists"].cast<py::array_t < char, py::array::c_style | py::array::forcecast > >();
 
-        for (size_t i = 0; i < appr_alg->cur_element_count_; i++) {
+        for (size_t i = 0; i < appr_alg->cur_element_count; i++) {
             if (label_lookup_val_npy.data()[i] < 0) {
                 throw std::runtime_error("Internal id cannot be negative!");
             } else {
@@ -565,9 +565,9 @@ class Index {
         memcpy(appr_alg->element_levels_.data(), element_levels_npy.data(), element_levels_npy.nbytes());
 
         size_t link_npy_size = 0;
-        std::vector<size_t> link_npy_offsets(appr_alg->cur_element_count_);
+        std::vector<size_t> link_npy_offsets(appr_alg->cur_element_count);
 
-        for (size_t i = 0; i < appr_alg->cur_element_count_; i++) {
+        for (size_t i = 0; i < appr_alg->cur_element_count; i++) {
             size_t linkListSize = appr_alg->element_levels_[i] > 0 ? appr_alg->size_links_per_element_ * appr_alg->element_levels_[i] : 0;
             link_npy_offsets[i] = link_npy_size;
             if (linkListSize)
@@ -599,7 +599,7 @@ class Index {
         appr_alg->num_deleted_ = 0;
         bool has_deletions = d["has_deletions"].cast<bool>();
         if (has_deletions) {
-            for (size_t i = 0; i < appr_alg->cur_element_count_; i++) {
+            for (size_t i = 0; i < appr_alg->cur_element_count; i++) {
                 if (appr_alg->isMarkedDeleted(i)) {
                     appr_alg->num_deleted_ += 1;
                     if (allow_replace_deleted) appr_alg->deleted_elements.insert(i);
@@ -718,7 +718,7 @@ class Index {
 
 
     size_t getCurrentCount() const {
-        return appr_alg->cur_element_count_;
+        return appr_alg->cur_element_count;
     }
 };
 
@@ -770,7 +770,7 @@ class BFIndex {
 
 
     size_t getCurrentCount() const {
-        return alg->cur_element_count_;
+        return alg->cur_element_count;
     }
 
 
@@ -842,7 +842,7 @@ class BFIndex {
             delete alg;
         }
         alg = new hnswlib::BruteforceSearch<dist_t>(space, path_to_index);
-        cur_l = alg->cur_element_count_;
+        cur_l = alg->cur_element_count;
         index_inited = true;
     }
 
@@ -966,7 +966,7 @@ PYBIND11_PLUGIN(hnswlib) {
             return index.index_inited ? index.appr_alg->max_elements_ : 0;
         })
         .def_property_readonly("element_count", [](const Index<float> & index) {
-            return index.index_inited ? (size_t)index.appr_alg->cur_element_count_ : 0;
+            return index.index_inited ? (size_t)index.appr_alg->cur_element_count : 0;
         })
         .def_property_readonly("ef_construction", [](const Index<float> & index) {
           return index.index_inited ? index.appr_alg->ef_construction_ : 0;

@@ -1,32 +1,29 @@
+/*
+   Copyright 2026 Huawei Technologies Co., Ltd.
+  
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+ */
+
+/**
+ * Modifications:
+ * - 2026 BoostKit: NEON vectorized distance calculation is supported.
+ */
+
 #pragma once
 #include "space_l2.h"
 #include "space_ip.h"
-#include "space_ip_template.h"
-#include "space_l2_template.h"
+#include <assert.h>
 #include <unordered_map>
-
-
-namespace hnswlib {
-template<typename T>
-inline float InnerProductTemplate(const void*, const void*, const void*);
-
-template<typename T>
-inline float L2SqrTemplate(const void*, const void*, const void*);
-}
-
-namespace hnswlib {
-inline float InnerProductFloat(const void* a, const void* b, const void* q) {
-    return InnerProductTemplate<float>(a, b, q);
-}
-inline float L2SqrFloat(const void* a, const void* b, const void* q) {
-    return L2SqrTemplate<float>(a, b, q);
-}
-}
-
-#if defined(HNSWLIB_USE_ARM)
-#define L2Sqr (&hnswlib::L2SqrFloat)
-#define InnerProductDistance (&hnswlib::InnerProductFloat)
-#endif
 
 namespace hnswlib {
 
@@ -60,6 +57,16 @@ class MultiVectorL2Space : public BaseMultiVectorSpace<DOCIDTYPE> {
             L2SqrSIMD16Ext = L2SqrSIMD16ExtAVX;
     #endif
 
+    #if defined(USE_NEON)
+        if (dim % 16 == 0)
+            fstdistfunc_ = L2SqrSIMD16ExtNEON;
+        else if (dim % 4 == 0)
+            fstdistfunc_ = L2SqrSIMD4ExtNEON;
+        else if (dim > 16)
+            fstdistfunc_ = L2SqrSIMD16ExtResidualsNEON;
+        else if (dim > 4)
+            fstdistfunc_ = L2SqrSIMD4ExtResidualsNEON;
+    #else
         if (dim % 16 == 0)
             fstdistfunc_ = L2SqrSIMD16Ext;
         else if (dim % 4 == 0)
@@ -68,6 +75,7 @@ class MultiVectorL2Space : public BaseMultiVectorSpace<DOCIDTYPE> {
             fstdistfunc_ = L2SqrSIMD16ExtResiduals;
         else if (dim > 4)
             fstdistfunc_ = L2SqrSIMD4ExtResiduals;
+    #endif
 #endif
         dim_ = dim;
         vector_size_ = dim * sizeof(float);
@@ -130,6 +138,16 @@ class MultiVectorInnerProductSpace : public BaseMultiVectorSpace<DOCIDTYPE> {
         }
     #endif
 
+    #if defined(USE_NEON)
+        if (dim % 16 == 0)
+            fstdistfunc_ = InnerProductDistanceSIMD16ExtNEON;
+        else if (dim % 4 == 0)
+            fstdistfunc_ = InnerProductDistanceSIMD4ExtNEON;
+        else if (dim > 16)
+            fstdistfunc_ = InnerProductDistanceSIMD16ExtResidualsNEON;
+        else if (dim > 4)
+            fstdistfunc_ = InnerProductDistanceSIMD4ExtResidualsNEON;
+    #else
         if (dim % 16 == 0)
             fstdistfunc_ = InnerProductDistanceSIMD16Ext;
         else if (dim % 4 == 0)
@@ -138,6 +156,7 @@ class MultiVectorInnerProductSpace : public BaseMultiVectorSpace<DOCIDTYPE> {
             fstdistfunc_ = InnerProductDistanceSIMD16ExtResiduals;
         else if (dim > 4)
             fstdistfunc_ = InnerProductDistanceSIMD4ExtResiduals;
+    #endif
 #endif
         vector_size_ = dim * sizeof(float);
         data_size_ = vector_size_ + sizeof(DOCIDTYPE);
@@ -224,11 +243,7 @@ class MultiVectorSearchStopCondition : public BaseSearchStopCondition<dist_t> {
         while (curr_num_docs_ > num_docs_to_search_) {
             dist_t dist_cand = candidates.back().first;
             dist_t dist_res = search_results_.top().first;
-            if (dist_cand != dist_res) {
-                throw std::runtime_error("Assertion failed: dist_cand == dist_res. dist_cand: " +
-                                         std::to_string(dist_cand) + ", dist_res: " +
-                                         std::to_string(dist_res));
-            }
+            assert(dist_cand == dist_res);
             DOCIDTYPE doc_id = search_results_.top().second;
             doc_counter_[doc_id] -= 1;
             if (doc_counter_[doc_id] == 0) {
@@ -252,11 +267,7 @@ class EpsilonSearchStopCondition : public BaseSearchStopCondition<dist_t> {
 
  public:
     EpsilonSearchStopCondition(float epsilon, size_t min_num_candidates, size_t max_num_candidates) {
-        if (min_num_candidates > max_num_candidates) {
-            throw std::runtime_error("Assertion failed: min_num_candidates <= max_num_candidates. min_num_candidates: " +
-                                     std::to_string(min_num_candidates) + ", max_num_candidates: " +
-                                     std::to_string(max_num_candidates));
-        }
+        assert(min_num_candidates <= max_num_candidates);
         epsilon_ = epsilon;
         min_num_candidates_ = min_num_candidates;
         max_num_candidates_ = max_num_candidates;
