@@ -1,5 +1,5 @@
 #include <assert.h>
-#include "hnswlib/hnswlib.h"
+#include "../../hnswlib/hnswlib.h"
 
 typedef unsigned int docidtype;
 typedef float dist_t;
@@ -21,7 +21,7 @@ int main() {
     // Initing index
     hnswlib::MultiVectorL2Space<docidtype> space(dim);
     hnswlib::BruteforceSearch<dist_t>* alg_brute = new hnswlib::BruteforceSearch<dist_t>(&space, max_elements);
-    hnswlib::HierarchicalNSWFloat* alg_hnsw = new hnswlib::HierarchicalNSWFloat(&space, max_elements, M, ef_construction);
+    hnswlib::HierarchicalNSW<dist_t>* alg_hnsw = new hnswlib::HierarchicalNSW<dist_t>(&space, max_elements, M, ef_construction);
 
     // Generate random data
     std::mt19937 rng;
