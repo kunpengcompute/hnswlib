@@ -46,7 +46,6 @@
 </tbody>
 </table>
 
-
 ### 编译安装
 
 从GitHub下载hnswlib开源代码，然后从GitCode下载hnswlib补丁代码，应用补丁。
@@ -90,8 +89,6 @@
     ```bash
     yum install hdf5-devel
     ```
-
-
 
 ## 兼容性验证
 
@@ -182,5 +179,3 @@ hnswlib是Hierarchical Navigable Small World（分层可导航小世界）图检
     测试结果如下图所示。
 
     ![](figures/zh-cn_image_0000002549877895.png)
-
-

@@ -59,9 +59,11 @@ space = std::make_unique<hnswlib::L2Space>(dim); // 构造方法二
 ```
 
 **参数**
+
 - `dim`: 向量维度
 
 **说明**
+
 - 根据向量维度自动选择最优的NEON指令实现（SIMD16、SIMD4或带残差处理的版本）
 - 支持维度为任意大小，内部会自动处理对齐和残差
 
@@ -75,9 +77,11 @@ space = std::make_unique<hnswlib::InnerProductSpace>(dim); // 构造方法二
 ```
 
 **参数**
+
 - `dim`: 向量维度
 
 **说明**
+
 - 根据向量维度自动选择最优的NEON指令实现
 - 内积距离定义为 `1.0 - sum(Ai*Bi)`
 
@@ -95,6 +99,7 @@ space = std::make_unique<hnswlib::L2SpacePh>(dim); // 构造方法二
 ```
 
 **参数**
+
 - `dim`: 向量维度
 
 **说明**
@@ -114,12 +119,17 @@ space = std::make_unique<hnswlib::IPSpacePh>(dim); // 构造方法二
 ```
 
 **参数**
+
 - `dim`: 向量维度
 
 **说明**
+
 - 仅在定义了`USE_NEON`宏时可用
+
 - 自动选择最优的NEON指令实现
+
 - 内存占用对比FP32显著减少
+
 
 ## HierarchicalNSW类
 
@@ -174,6 +184,7 @@ std::priority_queue<std::pair<float, labeltype>> searchKnn(
 ```
 
 **返回值**
+
 - 优先队列，包含k个最近邻，按距离从远到近排序
 
 #### searchKnnCloserFirst
@@ -189,6 +200,7 @@ std::vector<std::pair<float, labeltype>> searchKnnCloserFirst(
 ```
 
 **返回值**
+
 - 向量，包含k个最近邻，按距离从近到远排序
 
 #### saveIndex
@@ -211,8 +223,11 @@ void loadIndex(const std::string& location, SpaceInterface<float>* s, size_t max
 ```
 
 **参数**
+
 - `location`: 索引文件路径
+
 - `s`: 空间对象
+
 - `max_elements`: 可选的新最大元素数量
 
 #### setEf
@@ -224,6 +239,7 @@ void setEf(size_t ef);
 ```
 
 **参数**
+
 - `ef`: 查询时的ef参数值（应大于搜索的k值）
 
 #### markDelete
@@ -235,6 +251,7 @@ void markDelete(labeltype label);
 ```
 
 **参数**
+
 - `label`: 要删除的元素标签
 
 #### unmarkDelete
@@ -246,6 +263,7 @@ void unmarkDelete(labeltype label);
 ```
 
 **参数**
+
 - `label`: 要取消删除的元素标签
 
 #### resizeIndex
@@ -257,8 +275,8 @@ void resizeIndex(size_t new_max_elements);
 ```
 
 **参数**
-- `new_max_elements`: 新的最大元素数量（必须大于当前元素数量）
 
+- `new_max_elements`: 新的最大元素数量（必须大于当前元素数量）
 
 ## FP32与FP16接口比较
 
@@ -270,4 +288,3 @@ void resizeIndex(size_t new_max_elements);
 | 速度 | 快 | 更快（在支持NEON的ARM平台上） |
 | 空间类 | L2Space, InnerProductSpace | L2SpacePh, IPSpacePh |
 | 平台要求 | 无特殊要求 | 仅支持NEON架构 |
-
