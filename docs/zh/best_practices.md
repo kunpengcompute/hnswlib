@@ -2,7 +2,7 @@
 
 本节介绍在鲲鹏平台测试优化后的hnswlib的方法，依赖鲲鹏的优化补丁文件0001-hnswlib_0.8.0-optimize-fp32_fp16_dis_idsort_prefetch.patch。
 
-**优化后的hnswlib测试示例<a name="section18521028313"></a>**
+## 优化后的hnswlib测试示例
 
 下方使用示例以使用fashion-mnist-784-euclidean.hdf5数据集为例。
 
@@ -77,13 +77,13 @@
     >- 在后续运行中，如果不需要修改k\_f、efc的值，则可以在load模式和整机4numa下运行脚本获取性能数据。
     >- 如果需要修改k\_f、efc的值，则需要在save模式下重新构图。
 
-**性能优化建议**
+## 性能优化建议
 
 1. **选择合适的数据类型**：在精度要求不高的场景下，优先使用FP16以减少内存占用和提升性能。
 2. **调整参数**：调整M、efc、efs参数，详见[性能测试参数调优指导](#section3966431183112)。
 3. **批处理查询**：尽量批量处理查询，减少线程创建开销。
 
-**性能测试参数调优指导<a name="section3966431183112"></a>**
+## 性能测试参数调优指导
 
 假设参数调优的配置文件路径为“/path/to/sra_test/configs“，该文件夹的目录结构如下:
 
@@ -151,7 +151,7 @@ index_path = indexes/hnswlib_fp16/fashion.hnswlib
 >![](public_sys-resources/icon-note.gif) **说明：** 
 >在**save\_or\_load = save**模式下进行上述参数调优，构建索引时建议使用单NUMA，调优目标为保证召回率大于0.99的情况下，寻找qps最高的参数组合。
 
-**（可选）UT测试<a name="section136316366272"></a>**
+## （可选）UT测试
 
 执行下方指令，用于看护编译及运行环境是否正常，算法功能是否正确。
 
