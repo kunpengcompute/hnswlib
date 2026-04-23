@@ -65,59 +65,6 @@
 </tbody>
 </table>
 
-### 病毒扫描结果<a name="ZH-CN_TOPIC_0000002549873263"></a>
-
-本软件包、版本文档、产品文档经过防病毒软件扫描，未发现病毒。详细信息如下：
-
-<a name="table1980419519233"></a>
-<table><thead align="left"><tr id="row58533592317"><th class="cellrowborder" valign="top" width="15%" id="mcps1.1.6.1.1"><p id="p14853250231"><a name="p14853250231"></a><a name="p14853250231"></a>防病毒软件名称</p>
-</th>
-<th class="cellrowborder" valign="top" width="17%" id="mcps1.1.6.1.2"><p id="p1285355162312"><a name="p1285355162312"></a><a name="p1285355162312"></a>防病毒软件版本</p>
-</th>
-<th class="cellrowborder" valign="top" width="20.919999999999998%" id="mcps1.1.6.1.3"><p id="p4853353236"><a name="p4853353236"></a><a name="p4853353236"></a>病毒库版本</p>
-</th>
-<th class="cellrowborder" valign="top" width="28.08%" id="mcps1.1.6.1.4"><p id="p785317520238"><a name="p785317520238"></a><a name="p785317520238"></a>扫描时间</p>
-</th>
-<th class="cellrowborder" valign="top" width="19%" id="mcps1.1.6.1.5"><p id="p158539532314"><a name="p158539532314"></a><a name="p158539532314"></a>扫描结果</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row108547513239"><td class="cellrowborder" valign="top" width="15%" headers="mcps1.1.6.1.1 "><p id="p2800318490"><a name="p2800318490"></a><a name="p2800318490"></a>QiAnXin</p>
-</td>
-<td class="cellrowborder" valign="top" width="17%" headers="mcps1.1.6.1.2 "><p id="p1385415520232"><a name="p1385415520232"></a><a name="p1385415520232"></a>8.0.5.5260</p>
-</td>
-<td class="cellrowborder" valign="top" width="20.919999999999998%" headers="mcps1.1.6.1.3 "><p id="p165171010191418"><a name="p165171010191418"></a><a name="p165171010191418"></a>2025-06-27 08:00:00.0</p>
-</td>
-<td class="cellrowborder" valign="top" width="28.08%" headers="mcps1.1.6.1.4 "><p id="p19818043416"><a name="p19818043416"></a><a name="p19818043416"></a>2025-06-28 17:37:20</p>
-</td>
-<td class="cellrowborder" valign="top" width="19%" headers="mcps1.1.6.1.5 "><p id="p1485417542312"><a name="p1485417542312"></a><a name="p1485417542312"></a>OK</p>
-</td>
-</tr>
-<tr id="row385413511237"><td class="cellrowborder" valign="top" width="15%" headers="mcps1.1.6.1.1 "><p id="p1577103194920"><a name="p1577103194920"></a><a name="p1577103194920"></a>Bitdefender</p>
-</td>
-<td class="cellrowborder" valign="top" width="17%" headers="mcps1.1.6.1.2 "><p id="p182011711332"><a name="p182011711332"></a><a name="p182011711332"></a>7.0.3.2038</p>
-</td>
-<td class="cellrowborder" valign="top" width="20.919999999999998%" headers="mcps1.1.6.1.3 "><p id="p1318511176313"><a name="p1318511176313"></a><a name="p1318511176313"></a>7.99075</p>
-</td>
-<td class="cellrowborder" valign="top" width="28.08%" headers="mcps1.1.6.1.4 "><p id="p2709163518313"><a name="p2709163518313"></a><a name="p2709163518313"></a>2025-06-28 17:37:27</p>
-</td>
-<td class="cellrowborder" valign="top" width="19%" headers="mcps1.1.6.1.5 "><p id="p58541156237"><a name="p58541156237"></a><a name="p58541156237"></a>OK</p>
-</td>
-</tr>
-<tr id="row108549512238"><td class="cellrowborder" valign="top" width="15%" headers="mcps1.1.6.1.1 "><p id="p37373118492"><a name="p37373118492"></a><a name="p37373118492"></a>Kaspersky</p>
-</td>
-<td class="cellrowborder" valign="top" width="17%" headers="mcps1.1.6.1.2 "><p id="p076112491811"><a name="p076112491811"></a><a name="p076112491811"></a>12.0.0.6672</p>
-</td>
-<td class="cellrowborder" valign="top" width="20.919999999999998%" headers="mcps1.1.6.1.3 "><p id="p1331815415310"><a name="p1331815415310"></a><a name="p1331815415310"></a>2025-06-27 02:05:00</p>
-</td>
-<td class="cellrowborder" valign="top" width="28.08%" headers="mcps1.1.6.1.4 "><p id="p997063819376"><a name="p997063819376"></a><a name="p997063819376"></a>2025-06-28 17:37:17</p>
-</td>
-<td class="cellrowborder" valign="top" width="19%" headers="mcps1.1.6.1.5 "><p id="p148543518236"><a name="p148543518236"></a><a name="p148543518236"></a>OK</p>
-</td>
-</tr>
-</tbody>
-</table>
-
 ## 版本使用注意事项
 
 ### 使用注意事项
@@ -130,7 +77,7 @@
 
 **新增特性<a name="section11862975"></a>**
 
-hnswlib重构版本发布于Gitcode平台，支持fp16数据类型，支持NEON向量化、预取和底库ID重排优化，重构后的hnswlib精简了代码结构，提升了易用性。
+hnswlib重构版本发布于Gitcode平台，支持fp16数据类型，支持NEON向量化、预取和底库ID重排优化，重构后的hnswlib精简了代码结构，提升了易用性，代码分支版本号为**v1.1.0**。
 
 **修改特性<a name="section16450949161512"></a>**
 
