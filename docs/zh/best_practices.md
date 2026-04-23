@@ -11,7 +11,7 @@
 2. 获取测试程序。假设路径为"/path/to/sra_test"。
 
     ```bash
-    git clone https://gitcode.com/openeuler/sra_test.git
+    git clone -b v2.0.0 https://gitcode.com/openeuler/sra_test.git
     ```
 
 3. 创建data文件夹，获取测试数据集。

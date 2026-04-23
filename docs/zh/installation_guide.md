@@ -60,7 +60,7 @@
 2. 下载hnswlib的Patch文件，假设安装路径为“/path/to“。
 
     ```bash
-    git clone https://gitcode.com/boostkit/hnswlib.git hnswlib-patch
+    git clone -b v1.1.0 https://gitcode.com/boostkit/hnswlib.git hnswlib-patch
     ```
 
 3. 应用Patch。
