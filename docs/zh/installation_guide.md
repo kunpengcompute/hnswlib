@@ -1,8 +1,6 @@
 # 安装指南
 
-## 编译安装hnswlib
-
-### 已验证环境
+## 已验证环境
 
 为保证您可以顺利安全地使用hnswlib，请确保所使用的环境信息在已验证环境范围内。
 
@@ -46,18 +44,18 @@
 </tbody>
 </table>
 
-### 编译安装
+## 编译安装hnswlib
 
-从GitHub下载hnswlib开源代码，然后从GitCode下载hnswlib补丁代码，应用补丁。
+先从GitHub下载hnswlib开源代码，然后从GitCode下载hnswlib补丁代码，应用补丁。安装依赖需要使用yum命令，需要将当前用户切换至“root”用户执行。
 
-1. 获取开源代码，假设安装路径为“/path/to“。
+1. 获取开源代码，假设安装路径为“/path/to”。
 
     ```bash
     cd /path/to
     git clone -b v0.8.0 https://github.com/nmslib/hnswlib.git
     ```
 
-2. 下载hnswlib的Patch文件，假设安装路径为“/path/to“。
+2. 下载hnswlib的Patch文件，假设安装路径为“/path/to”。
 
     ```bash
     git clone -b v1.1.0 https://gitcode.com/boostkit/hnswlib.git hnswlib-patch
@@ -96,7 +94,7 @@
 
 **测试源码目录说明<a name="section1198818518336"></a>**
 
-假设程序运行的目录为“/path/to/hnswlib“，完整的目录结构应如下所示：
+假设程序运行的目录为“/path/to/hnswlib”，完整的目录结构应如下所示：
 
 ```text
 ├── examples/           // 功能测试文件
@@ -132,8 +130,8 @@ hnswlib是Hierarchical Navigable Small World（分层可导航小世界）图检
         vim CMakeLists.txt
         ```
 
-    2. 将文件中的“-march=native“修改为“-march=armv8.2-a+dotprod“。
-    3. 按“Esc“键，输入:**wq!**，按“Enter“保存并退出编辑。
+    2. 将文件中的“-march=native”修改为“-march=armv8.2-a+dotprod”。
+    3. 按“Esc”键，输入:**wq!**，按“Enter”保存并退出编辑。
 
 3. 添加测试脚本。
 

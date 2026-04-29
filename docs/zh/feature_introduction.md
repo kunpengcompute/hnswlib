@@ -73,7 +73,7 @@ FP16数据类型将每个向量分量的存储空间从FP32的4字节减少到2�
 
 **功能说明**
 
-使用优化版本的hnswlib并开启`USE_NEON`宏后，自动开启AggressiveRenumberInplace，重排优化HNSW图的节点ID，在保持图拓扑结构不变的前提下，最大化邻居节点ID的局部连续性，可以提高缓存利用率和访问速度。
+使用优化版本的hnswlib并开启`USE_NEON`宏后，自动开启AggressiveRenumberInplace，重排HNSW图的节点ID，在保持图拓扑结构不变的前提下，最大化邻居节点ID的局部连续性，可以提高缓存利用率和访问速度。
 
 #### 技术实现
 

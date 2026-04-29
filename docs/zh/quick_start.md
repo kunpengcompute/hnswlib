@@ -4,7 +4,7 @@
 
 **源码目录说明<a name="section20169143153012"></a>**
 
-假设程序运行的目录为“"/path/to/hnswlib"“，完整的目录结构应如下所示：
+假设程序运行的目录为“/path/to/hnswlib”，完整的目录结构应如下所示：
 
 ```text
 ├── examples/           // 功能测试文件
@@ -94,7 +94,7 @@ void demonstrateFp32() {
         std::cout << "   正确识别查询点的比例: " << (float)correct / NUM_QUERIES * 100 << "%\n";
         
         // 保存索引到文件
-        const std::string index_file = "l2_index.bin";;
+        const std::string index_file = "l2_index.bin";
         index.saveIndex(index_file);
         
         // 从文件加载索引

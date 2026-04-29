@@ -4,9 +4,9 @@
 
 ## 优化后的hnswlib测试示例
 
-下方使用示例以使用fashion-mnist-784-euclidean.hdf5数据集为例。
+下方使用示例以fashion-mnist-784-euclidean.hdf5数据集为例。
 
-1. 请参见[安装指南](./installation_guide.md)安装hnswlib。
+1. 请参见《[安装指南](./installation_guide.md)》安装hnswlib。
 
 2. 获取测试程序。假设路径为"/path/to/sra_test"。
 
@@ -24,10 +24,17 @@
 
 4. 编译可执行文件。
 
-    ```bash
-    make hnswlib_test          // fp32数据类型，使用neon向量化指令。
-    make hnswlib_fp16_test     // fp16数据类型，使用neon向量化指令。
-    ```
+   - FP32数据类型，使用NEON向量化指令。
+
+     ```bash
+     make hnswlib_test
+     ```
+
+   - FP16数据类型，使用NEON向量化指令。
+
+     ```bash
+     make hnswlib_fp16_test
+     ```
 
     完整的目录结构如下所示。
 
@@ -67,7 +74,7 @@
     sh test.sh hnswlib_fp16           // fp16数据类型，使用neon向量化指令。
     ```
 
-    测试结果存在output文件夹中，关注测试结果的qps指标，并且召回率大于0.99。
+    测试结果存在output文件夹中，关注测试结果的QPS指标，并且召回率大于0.99。
 
     >![](public_sys-resources/icon-note.gif) **说明：** 
     >- "/configs"文件夹下包含了不同数据集的配置信息，其中，index\_path是索引保存路径，save\_or\_load是图索引构建或加载选项。
@@ -85,7 +92,7 @@
 
 ## 性能测试参数调优指导
 
-假设参数调优的配置文件路径为“/path/to/sra_test/configs“，该文件夹的目录结构如下:
+假设参数调优的配置文件路径为“/path/to/sra_test/configs”，该文件夹的目录结构如下:
 
 ```text
 ├── configs/
@@ -149,11 +156,11 @@ index_path = indexes/hnswlib_fp16/fashion.hnswlib
 </table>
 
 >![](public_sys-resources/icon-note.gif) **说明：** 
->在**save\_or\_load = save**模式下进行上述参数调优，构建索引时建议使用单NUMA，调优目标为保证召回率大于0.99的情况下，寻找qps最高的参数组合。
+>在**save\_or\_load = save**模式下进行上述参数调优，构建索引时建议使用单NUMA，调优目标为保证召回率大于0.99的情况下，寻找QPS最高的参数组合。
 
 ## （可选）UT测试
 
-执行下方指令，用于看护编译及运行环境是否正常，算法功能是否正确。
+执行下方指令，用于检查编译及运行环境是否正常，算法功能是否正确。
 
 1. 创建UT测试运行脚本。
 
@@ -174,7 +181,7 @@ index_path = indexes/hnswlib_fp16/fashion.hnswlib
     ./distance_calculation_neon_test
     ```
 
- 粘贴上述内容至脚本后，按ESC，输入":wq"后回车，保存文件并退出。
+   粘贴上述内容至脚本后，按ESC，输入":wq"后回车，保存文件并退出。
 
 2. 运行UT测试。
 
