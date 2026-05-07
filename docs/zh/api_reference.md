@@ -2,7 +2,7 @@
 
 ## 概述
 
-在开源hnswlib API的基础上，新增了FP16数据类型的距离计算空间类L2SpacePh和IPSpacePh，用于在ARM平台上加速FP16向量的距离计算。其余API与开源hnswlib API保持不变。FP32和FP16的距离计算实现差异体现在加载数据类型不同。FP32距离计算加载FP32类型数据，FP16距离计算加载FP16类型数据，但二者均返回FP32数据类型的计算结果。本文档将详细介绍hnswlib算法涉及的API接口。
+在开源hnswlib API的基础上，新增了FP16数据类型的距离计算空间类L2SpacePh和IPSpacePh，用于在ARM平台上加速FP16向量的距离计算。其余API与开源hnswlib API保持不变。FP32和FP16的距离计算实现差异体现在加载数据类型不同。FP32距离计算加载FP32类型数据，FP16距离计算加载FP16类型数据，但二者均返回FP32数据类型的计算结果。本文档作为hnswlib算法的API参考手册，详细介绍了各接口的功能和使用方法。
 
 ## 与开源代码的差异
 
@@ -60,7 +60,9 @@ space = std::make_unique<hnswlib::L2Space>(dim); // 构造方法二
 
 **参数**
 
-- `dim`: 向量维度
+| 参数 | 参数说明 |
+| --- | --- |
+| `dim` | 向量维度。 |
 
 **说明**
 
@@ -78,7 +80,9 @@ space = std::make_unique<hnswlib::InnerProductSpace>(dim); // 构造方法二
 
 **参数**
 
-- `dim`: 向量维度
+| 参数 | 参数说明 |
+| --- | --- |
+| `dim` | 向量维度。 |
 
 **说明**
 
@@ -100,9 +104,12 @@ space = std::make_unique<hnswlib::L2SpacePh>(dim); // 构造方法二
 
 **参数**
 
-- `dim`: 向量维度
+| 参数 | 参数说明 |
+| --- | --- |
+| `dim` | 向量维度。 |
 
 **说明**
+
 - 仅在定义了`USE_NEON`宏时可用
 - 自动选择最优的NEON指令实现
 - 内存占用对比FP32显著减少
@@ -120,7 +127,9 @@ space = std::make_unique<hnswlib::IPSpacePh>(dim); // 构造方法二
 
 **参数**
 
-- `dim`: 向量维度
+| 参数 | 参数说明 |
+| --- | --- |
+| `dim` | 向量维度。 |
 
 **说明**
 
@@ -129,7 +138,6 @@ space = std::make_unique<hnswlib::IPSpacePh>(dim); // 构造方法二
 - 自动选择最优的NEON指令实现
 
 - 内存占用对比FP32显著减少
-
 
 ## HierarchicalNSW类
 
@@ -167,9 +175,12 @@ void addPoint(const void* data_point, labeltype label, bool replace_deleted = fa
 ```
 
 **参数**
-- `data_point`: 指向数据点的指针（FP32或FP16类型，取决于使用的空间类）
-- `label`: 数据点的标签
-- `replace_deleted`: 是否允许替换已删除的元素（需要构造时设置`allow_replace_deleted=true`）
+
+| 参数 | 参数说明 |
+| --- | --- |
+| `data_point` | 指向数据点的指针（FP32或FP16类型，取决于使用的空间类）。 |
+| `label` | 数据点的标签。 |
+| `replace_deleted` | 是否允许替换已删除的元素（需要构造时设置`allow_replace_deleted=true`）。 |
 
 #### searchKnn
 
@@ -212,7 +223,10 @@ void saveIndex(const std::string& location);
 ```
 
 **参数**
-- `location`: 保存文件的路径
+
+| 参数 | 参数说明 |
+| --- | --- |
+| `location` | 保存文件的路径。 |
 
 #### loadIndex
 
@@ -224,11 +238,11 @@ void loadIndex(const std::string& location, SpaceInterface<float>* s, size_t max
 
 **参数**
 
-- `location`: 索引文件路径
-
-- `s`: 空间对象
-
-- `max_elements`: 可选的新最大元素数量
+| 参数 | 参数说明 |
+| --- | --- |
+| `location` | 索引文件路径。 |
+| `s` | 空间对象。 |
+| `max_elements` | 可选的新最大元素数量。 |
 
 #### setEf
 
@@ -240,7 +254,9 @@ void setEf(size_t ef);
 
 **参数**
 
-- `ef`: 查询时的ef参数值（应大于搜索的k值）
+| 参数 | 参数说明 |
+| --- | --- |
+| `ef` | 查询时的ef参数值（应大于搜索的k值）。 |
 
 #### markDelete
 
@@ -252,7 +268,9 @@ void markDelete(labeltype label);
 
 **参数**
 
-- `label`: 要删除的元素标签
+| 参数 | 参数说明 |
+| --- | --- |
+| `label` | 要删除的元素标签。 |
 
 #### unmarkDelete
 
@@ -264,7 +282,9 @@ void unmarkDelete(labeltype label);
 
 **参数**
 
-- `label`: 要取消删除的元素标签
+| 参数 | 参数说明 |
+| --- | --- |
+| `label` | 要取消删除的元素标签。 |
 
 #### resizeIndex
 
@@ -276,7 +296,9 @@ void resizeIndex(size_t new_max_elements);
 
 **参数**
 
-- `new_max_elements`: 新的最大元素数量（必须大于当前元素数量）
+| 参数 | 参数说明 |
+| --- | --- |
+| `new_max_elements` | 新的最大元素数量（必须大于当前元素数量）。 |
 
 ## FP32与FP16接口比较
 

@@ -2,8 +2,8 @@
 
 ## 最新消息
 
--   \[2026.03.30\]：hnswlib重构版本发布于Gitcode平台，支持fp16数据类型，支持NEON向量化、预取和底库ID重排优化，重构后的hnswlib精简了代码结构，提升了易用性。
--   \[2025.12.30\]：hnswlib发布于Gitcode平台，支持fp16数据类型，支持NEON和SVE向量化、预取和底库id重排优化。
+- \[2026.03.30\]：hnswlib重构版本发布于Gitcode平台，支持fp16数据类型，支持NEON向量化、预取和底库ID重排优化，重构后的hnswlib精简了代码结构，提升了易用性。
+- \[2025.12.30\]：hnswlib发布于Gitcode平台，支持fp16数据类型，支持NEON和SVE向量化、预取和底库id重排优化。
 
 ## 项目介绍
 
@@ -15,20 +15,26 @@ hnswlib是一个高效的近似最近邻 （Approximate Nearest Neighbor，ANN�
 
 hnswlib适用于推荐系统召回阶段，当数据集的数据类型为FP16时，可使用新增的FP16接口进行图检索，从而优化计算效率与内存占用。
 
-
 ## 目录结构
 
 hnswlib开源仓完整的目录结构如下所示：
 
 ```text
-├── docs/                                                             // 学习文档
+├── docs                                                            # 中文文档目录
+│   ├── api_reference.md                                            # API参考
+│   ├── best_practices.md                                           # 最佳实践
+│   ├── feature_introduction.md                                     # 特性介绍
+│   ├── installation_guide.md                                       # 安装指南
+│   ├── quick_start.md                                              # 快速入门
+│   └── release_notes.md                                            # 版本说明书
 ├── public_sys-resources/
-├── 0001-hnswlib_0.8.0-optimize-fp32_fp16_dis_idsort_prefetch.patch   // hnswlib源码补丁文件
-├── LICENSE                                                           // 项目License文件
-└── README.md                                                         // hnswlib开源仓介绍文件
+├── 0001-hnswlib_0.8.0-optimize-fp32_fp16_dis_idsort_prefetch.patch # hnswlib源码补丁文件
+├── LICENSE                                                         # 项目License文件
+└── README.md                                                       # hnswlib开源仓介绍文件
 ```
 
 使能补丁后的目录结构如下所示：
+
 ```text
 ├── hnswlib/                  // 核心库代码目录
 │   ├── bruteforce.h          // 暴力搜索实现
@@ -64,7 +70,6 @@ hnswlib开源仓完整的目录结构如下所示：
 -march=armv8.2-a+dotprod+fp16fml -DUSE_NEON
 ```
 
-
 ## 与原生hnswlib的兼容性
 
 本版本保持了与原生hnswlib API的完全兼容，同时添加了以下新特性：
@@ -78,55 +83,47 @@ hnswlib开源仓完整的目录结构如下所示：
 
 ## 版本说明
 
-关于hnswlib算法的版本更新情况请参见《[hnswlib 版本说明书](./docs/zh/release_notes.md)》。
-
+关于hnswlib算法的版本更新情况请参见《[版本说明书](./docs/zh/release_notes.md)》。
 
 ## 学习文档
 
 <a name="table1191773710200"></a>
-<table><thead align="left"><tr id="row1291816372202"><th class="cellrowborder" valign="top" width="12.04120412041204%" id="mcps1.1.4.1.1"><p id="p291823714205"><a name="p291823714205"></a><a name="p291823714205"></a>学习资源类别</p>
-</th>
+<table><thead align="left"><tr id="row1291816372202">
 <th class="cellrowborder" valign="top" width="16.67166716671667%" id="mcps1.1.4.1.2"><p id="p13918183762016"><a name="p13918183762016"></a><a name="p13918183762016"></a>学习资源名称</p>
 </th>
 <th class="cellrowborder" valign="top" width="71.28712871287128%" id="mcps1.1.4.1.3"><p id="p89181437152019"><a name="p89181437152019"></a><a name="p89181437152019"></a>学习资源简介</p>
 </th>
 </tr>
 </thead>
-<tbody><tr id="row179181137112015"><td class="cellrowborder" valign="top" width="12.04120412041204%" headers="mcps1.1.4.1.1 "><p id="p1918123710208"><a name="p1918123710208"></a><a name="p1918123710208"></a>文档</p>
-</td>
+<tbody><tr id="row179181137112015">
 <td class="cellrowborder" valign="top" width="16.67166716671667%" headers="mcps1.1.4.1.2 "><p id="p2091893722011"><a name="p2091893722011"></a><a name="p2091893722011"></a><a href="./docs/zh/release_notes.md">版本说明书</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.28712871287128%" headers="mcps1.1.4.1.3 "><p id="p491893752010"><a name="p491893752010"></a><a name="p491893752010"></a>提供hnswlib每个发布版本的基础信息和特性更新信息。</p>
 </td>
 </tr>
-<tr id="row2918153732017"><td class="cellrowborder" valign="top" width="12.04120412041204%" headers="mcps1.1.4.1.1 "><p id="p598512211214"><a name="p598512211214"></a><a name="p598512211214"></a>文档</p>
-</td>
+<tr id="row2918153732017">
 <td class="cellrowborder" valign="top" width="16.67166716671667%" headers="mcps1.1.4.1.2 "><p id="p17918337172020"><a name="p17918337172020"></a><a name="p17918337172020"></a><a href="./docs/zh/quick_start.md">快速入门</p>
 <td class="cellrowborder" valign="top" width="71.28712871287128%" headers="mcps1.1.4.1.3 "><p id="p15918183742018"><a name="p15918183742018"></a><a name="p15918183742018"></a>提供hnswlib部署方法和验证性能与功能的快速入门指导。</p>
 </td>
 </tr>
-<tr id="row1491853716207"><td class="cellrowborder" valign="top" width="12.04120412041204%" headers="mcps1.1.4.1.1 "><p id="p3615192392120"><a name="p3615192392120"></a><a name="p3615192392120"></a>文档</p>
-</td>
+<tr id="row1491853716207">
 <td class="cellrowborder" valign="top" width="16.67166716671667%" headers="mcps1.1.4.1.2 "><p id="p191833772015"><a name="p191833772015"></a><a name="p191833772015"></a><a href="./docs/zh/installation_guide.md">安装指南</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.28712871287128%" headers="mcps1.1.4.1.3 "><p id="p091873712013"><a name="p091873712013"></a><a name="p091873712013"></a>提供hnswlib源码编译安装方法的详细指导。</p>
 </td>
 </tr>
-<tr id="row109181737112010"><td class="cellrowborder" valign="top" width="12.04120412041204%" headers="mcps1.1.4.1.1 "><p id="p6213152432115"><a name="p6213152432115"></a><a name="p6213152432115"></a>文档</p>
-</td>
+<tr id="row109181737112010">
 <td class="cellrowborder" valign="top" width="16.67166716671667%" headers="mcps1.1.4.1.2 "><p id="p5918537142018"><a name="p5918537142018"></a><a name="p5918537142018"></a><a href="./docs/zh/best_practices.md">最佳实践</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.28712871287128%" headers="mcps1.1.4.1.3 "><p id="p991893772013"><a name="p991893772013"></a><a name="p991893772013"></a>提供hnswlib的测试方法和性能优化建议。</p>
 </td>
 </tr>
-<tr id="row169181237152012"><td class="cellrowborder" valign="top" width="12.04120412041204%" headers="mcps1.1.4.1.1 "><p id="p169181237152012"><a name="p169181237152012"></a><a name="p169181237152012"></a>文档</p>
-</td>
+<tr id="row169181237152012">
 <td class="cellrowborder" valign="top" width="16.67166716671667%" headers="mcps1.1.4.1.2 "><p id="p19181237162012"><a name="p19181237162012"></a><a name="p19181237162012"></a><a href="./docs/zh/api_reference.md">API参考</p>
 <td class="cellrowborder" valign="top" width="71.28712871287128%" headers="mcps1.1.4.1.3 "><p id="p991893772014"><a name="p991893772014"></a><a name="p991893772014"></a>提供hnswlib的API说明和使用示例。</p>
 </td>
 </tr>
-<tr id="row169181237152013"><td class="cellrowborder" valign="top" width="12.04120412041204%" headers="mcps1.1.4.1.1 "><p id="p169181237152013"><a name="p169181237152013"></a><a name="p169181237152013"></a>文档</p>
-</td>
+<tr id="row169181237152013">
 <td class="cellrowborder" valign="top" width="16.67166716671667%" headers="mcps1.1.4.1.2 "><p id="p19181237162013"><a name="p19181237162013"></a><a name="p19181237162013"></a><a href="./docs/zh/feature_introduction.md">特性介绍</p>
 <td class="cellrowborder" valign="top" width="71.28712871287128%" headers="mcps1.1.4.1.3 "><p id="p991893772015"><a name="p991893772015"></a><a name="p991893772015"></a>提供hnswlib的优化特性介绍。</p>
 </td>
