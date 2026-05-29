@@ -20,44 +20,18 @@ hnswlib适用于推荐系统召回阶段，当数据集的数据类型为FP16时
 hnswlib开源仓完整的目录结构如下所示：
 
 ```text
-├── docs                                                            # 中文文档目录
-│   ├── api_reference.md                                            # API参考
-│   ├── best_practices.md                                           # 最佳实践
-│   ├── feature_introduction.md                                     # 特性介绍
-│   ├── installation_guide.md                                       # 安装指南
-│   ├── quick_start.md                                              # 快速入门
-│   └── release_notes.md                                            # 版本说明书
+├── docs                                                            # 文档目录
+    ├── zh
+       ├── api_reference.md                                         # API参考
+       ├── best_practices.md                                        # 最佳实践
+       ├── feature_introduction.md                                  # 特性介绍
+       ├── installation_guide.md                                    # 安装指南
+       ├── quick_start.md                                           # 快速入门
+       └── release_notes.md                                         # 版本说明书
 ├── public_sys-resources/
 ├── 0001-hnswlib_0.8.0-optimize-fp32_fp16_dis_idsort_prefetch.patch # hnswlib源码补丁文件
 ├── LICENSE                                                         # 项目License文件
 └── README.md                                                       # hnswlib开源仓介绍文件
-```
-
-使能补丁后的目录结构如下所示：
-
-```text
-├── hnswlib/                  // 核心库代码目录
-│   ├── bruteforce.h          // 暴力搜索实现
-│   ├── hnswalg.h             // HNSW算法核心实现
-│   ├── hnswlib.h             // 主头文件，定义核心接口
-│   ├── safe_memory.h         // 内存安全操作工具类
-│   ├── space_ip.h            // 内积距离空间实现
-│   ├── space_l2.h            // L2距离空间实现
-│   ├── stop_condition.h      // 停止条件实现
-│   └── visited_list_pool.h   // 访问列表池实现
-├── examples/                 // 测试代码目录
-├── tests/                    // 测试代码目录
-├── python_bindings/          // Python接口
-├── .gitignore
-├── ALGO_PARAMS.md            // HNSW算法参数说明
-├── CMakeLists.txt            // CMake构建文件
-├── LICENSE
-├── Makefile                  // Makefile构建文件
-├── MANIFEST.in
-├── pyproject.toml            // Python项目配置文件
-├── README.md                 // 项目说明文档
-├── setup.py                  // Python项目安装脚本
-└── TESTING_RECALL.md         // 测试召回率说明
 ```
 
 ## 编译选项
