@@ -68,6 +68,33 @@
     patch -p1 < ../hnswlib-patch/0001-hnswlib_0.8.0-optimize-fp32_fp16_dis_idsort_prefetch.patch
     ```
 
+    使能补丁后的目录结构如下所示：
+
+    ```text
+    ├── hnswlib/                  // 核心库代码目录
+    │   ├── bruteforce.h          // 暴力搜索实现
+    │   ├── hnswalg.h             // HNSW算法核心实现
+    │   ├── hnswlib.h             // 主头文件，定义核心接口
+    │   ├── safe_memory.h         // 内存安全操作工具类
+    │   ├── space_ip.h            // 内积距离空间实现
+    │   ├── space_l2.h            // L2距离空间实现
+    │   ├── stop_condition.h      // 停止条件实现
+    │   └── visited_list_pool.h   // 访问列表池实现
+    ├── examples/                 // 测试代码目录
+    ├── tests/                    // 测试代码目录
+    ├── python_bindings/          // Python接口
+    ├── .gitignore
+    ├── ALGO_PARAMS.md            // HNSW算法参数说明
+    ├── CMakeLists.txt            // CMake构建文件
+    ├── LICENSE
+    ├── Makefile                  // Makefile构建文件
+    ├── MANIFEST.in
+    ├── pyproject.toml            // Python项目配置文件
+    ├── README.md                 // 项目说明文档
+    ├── setup.py                  // Python项目安装脚本
+    └── TESTING_RECALL.md         // 测试召回率说明
+    ```
+
 4. 安装GCC 12.3.1与GCC-C++ 12.3.1。
 
     ```bash
