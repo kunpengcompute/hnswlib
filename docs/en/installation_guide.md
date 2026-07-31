@@ -44,7 +44,7 @@ To use hnswlib smoothly and securely, ensure that your environment is one of the
 </tbody>
 </table>
 
-### Compilation and Installation
+## Compilation and Installation
 
 Download the open-source code of hnswlib from GitHub, download the hnswlib patch code from GitCode, and apply the patch.
 
