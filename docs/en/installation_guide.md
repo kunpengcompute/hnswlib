@@ -1,8 +1,6 @@
 # Installation Guide
 
-## Compiling and Installing hnswlib
-
-### Verified Environments
+## Verified Environments
 
 To use hnswlib smoothly and securely, ensure that your environment is one of the verified environments.
 

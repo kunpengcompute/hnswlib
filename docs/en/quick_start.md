@@ -2,7 +2,7 @@
 
 After installing the hnswlib source code, follow the following instructions to verify the core functions of hnswlib optimized for the Kunpeng platform.
 
-**Source Code Directory Description<a name="section20169143153012"></a>**
+## Source Code Directory Description<a name="section20169143153012"></a>
 
 Assume that the directory where the program runs is `/path/to/hnswlib`. The complete directory structure is as follows:
 
@@ -22,7 +22,7 @@ Assume that the directory where the program runs is `/path/to/hnswlib`. The comp
 └── TESTING_RECALL.md
 ```
 
-**Quick Start Code Example<a name="section287635033012"></a>**
+## Quick Start Code Example<a name="section287635033012"></a>
 
 This section provides an example of using hnswlib, including index creation, element insertion, searching, index saving, and index loading.
 
