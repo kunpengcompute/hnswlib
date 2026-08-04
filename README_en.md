@@ -65,39 +65,32 @@ For details about the version updates of the hnswlib algorithm, see [Release Not
 <table>
   <thead align="left">
     <tr id="row1291816372202">
-      <th class="cellrowborder" valign="top" width="12.04120412041204%" id="mcps1.1.4.1.1"><p id="p291823714205">Resource Type</p></th>
       <th class="cellrowborder" valign="top" width="16.67166716671667%" id="mcps1.1.4.1.2"><p id="p13918183762016">Resource Name</p></th>
       <th class="cellrowborder" valign="top" width="71.28712871287128%" id="mcps1.1.4.1.3"><p id="p89181437152019">Resource Description</p></th>
     </tr>
   </thead>
   <tbody>
     <tr id="row179181137112015">
-      <td class="cellrowborder" valign="top" width="12.04120412041204%" headers="mcps1.1.4.1.1 "><p id="p1918123710208">Document</p></td>
       <td class="cellrowborder" valign="top" width="16.67166716671667%" headers="mcps1.1.4.1.2 "><p id="p2091893722011"><a href="./docs/en/release_notes.md">Release Notes</a></p></td>
       <td class="cellrowborder" valign="top" width="71.28712871287128%" headers="mcps1.1.4.1.3 "><p id="p491893752010">Provides the basic information and feature updates of each released version of hnswlib.</p></td>
     </tr>
     <tr id="row2918153732017">
-      <td class="cellrowborder" valign="top" width="12.04120412041204%" headers="mcps1.1.4.1.1 "><p id="p598512211214">Document</p></td>
       <td class="cellrowborder" valign="top" width="16.67166716671667%" headers="mcps1.1.4.1.2 "><p id="p17918337172020"><a href="./docs/en/quick_start.md">Quick Start</a></p></td>
       <td class="cellrowborder" valign="top" width="71.28712871287128%" headers="mcps1.1.4.1.3 "><p id="p15918183742018">Provides guidance on how to quickly deploy hnswlib and verify its performance and functions.</p></td>
     </tr>
     <tr id="row1491853716207">
-      <td class="cellrowborder" valign="top" width="12.04120412041204%" headers="mcps1.1.4.1.1 "><p id="p3615192392120">Document</p></td>
       <td class="cellrowborder" valign="top" width="16.67166716671667%" headers="mcps1.1.4.1.2 "><p id="p191833772015"><a href="./docs/en/installation_guide.md">Installation Guide</a></p></td>
       <td class="cellrowborder" valign="top" width="71.28712871287128%" headers="mcps1.1.4.1.3 "><p id="p091873712013">Provides detailed guidance on how to compile and install the hnswlib source code.</p></td>
     </tr>
     <tr id="row109181737112010">
-      <td class="cellrowborder" valign="top" width="12.04120412041204%" headers="mcps1.1.4.1.1 "><p id="p6213152432115">Document</p></td>
       <td class="cellrowborder" valign="top" width="16.67166716671667%" headers="mcps1.1.4.1.2 "><p id="p5918537142018"><a href="./docs/en/best_practices.md">Best Practices</a></p></td>
       <td class="cellrowborder" valign="top" width="71.28712871287128%" headers="mcps1.1.4.1.3 "><p id="p991893772013">Describes how to test hnswlib and provides tuning suggestions.</p></td>
     </tr>
     <tr id="row169181237152012">
-      <td class="cellrowborder" valign="top" width="12.04120412041204%" headers="mcps1.1.4.1.1 "><p id="p169181237152012">Document</p></td>
       <td class="cellrowborder" valign="top" width="16.67166716671667%" headers="mcps1.1.4.1.2 "><p id="p19181237162012"><a href="./docs/en/api_reference.md">API Reference</a></p></td>
       <td class="cellrowborder" valign="top" width="71.28712871287128%" headers="mcps1.1.4.1.3 "><p id="p991893772014">Provides definitions of hnswlib APIs and describes how to use them.</p></td>
     </tr>
     <tr id="row169181237152013">
-      <td class="cellrowborder" valign="top" width="12.04120412041204%" headers="mcps1.1.4.1.1 "><p id="p169181237152013">Document</p></td>
       <td class="cellrowborder" valign="top" width="16.67166716671667%" headers="mcps1.1.4.1.2 "><p id="p19181237162013"><a href="./docs/en/feature_introduction.md">Feature Introduction</a></p></td>
       <td class="cellrowborder" valign="top" width="71.28712871287128%" headers="mcps1.1.4.1.3 "><p id="p991893772015">Describes the optimization features of hnswlib.</p></td>
     </tr>

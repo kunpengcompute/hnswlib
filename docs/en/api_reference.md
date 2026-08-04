@@ -250,7 +250,9 @@ void markDelete(labeltype label);
 
 **Parameters**
 
-- `label`: label of the element to be deleted
+| Parameter| Parameter Description|
+|------|----------|
+| label| label of the element to be deleted|
 
 #### unmarkDelete
 
@@ -262,7 +264,9 @@ void unmarkDelete(labeltype label);
 
 **Parameters**
 
-- `label`: label of the element to be undeleted
+| Parameter| Parameter Description|
+|------|----------|
+| label| label of the element to be undeleted|
 
 #### resizeIndex
 
@@ -274,7 +278,9 @@ void resizeIndex(size_t new_max_elements);
 
 **Parameters**
 
-- `new_max_elements`: new maximum number of elements (must be greater than the current number of elements)
+| Parameter| Parameter Description|
+|------|----------|
+| new_max_elements| new maximum number of elements (must be greater than the current number of elements)|
 
 ## Comparison between FP32 and FP16 APIs
 

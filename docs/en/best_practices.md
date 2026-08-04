@@ -2,7 +2,7 @@
 
 This document describes how to test the optimized hnswlib on the Kunpeng platform. The test depends on the Kunpeng optimization patch file `0001-hnswlib_0.8.0-optimize-fp32_fp16_dis_idsort_prefetch.patch`.
 
-**Testing Example of the Optimized hnswlib<a name="section18521028313"></a>**
+## Testing Example of the Optimized hnswlib<a name="section18521028313"></a>
 
 The following example uses the `fashion-mnist-784-euclidean.hdf5` dataset.
 
