@@ -20,6 +20,11 @@
 <td class="cellrowborder" valign="top" width="57.830000000000005%" headers="mcps1.1.3.3.1 "><p id="p1730912179911"><a name="p1730912179911"></a><a name="p1730912179911"></a>hnswlib</p>
 </td>
 </tr>
+<tr id="row1930811171892"><th class="firstcol" valign="top" width="42.17%" id="mcps1.1.3.3.1"><p id="p2030912172097"><a name="p2030912172097"></a><a name="p2030912172097"></a>Software Version</p>
+</th>
+<td class="cellrowborder" valign="top" width="57.830000000000005%" headers="mcps1.1.3.3.1 "><p id="p1730912179911"><a name="p1730912179911"></a><a name="p1730912179911"></a>v1.1.0</p>
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -124,7 +129,7 @@ The software packages, release documents, and product documents have been scanne
 
 For details, see the [Installation Guide](./installation_guide.md).
 
-## V26.0.RC1
+## v1.1.0
 
 ### Change Description
 
@@ -148,7 +153,7 @@ None
 
 None
 
-## V25.3.0
+## v1.0.0
 
 ### Change Description
 

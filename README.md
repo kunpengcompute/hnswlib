@@ -1,5 +1,7 @@
 # hnswlib介绍
 
+简体中文|[English](./README_en.md)
+
 ## 最新消息
 
 - \[2026.03.30\]：hnswlib重构版本发布于Gitcode平台，支持fp16数据类型，支持NEON向量化、预取和底库ID重排优化，重构后的hnswlib精简了代码结构，提升了易用性。
@@ -133,9 +135,4 @@ hnswlib采用Apache 2.0 License许可证授权，支持修改代码和再开源�
 
 ## 致谢
 
-hnswlib由华为公司的下列部门联合贡献：
-
--   鲲鹏计算Boostkit开发部
-
 感谢来自社区的每一个PR，欢迎贡献hnswlib！
-
