@@ -1,5 +1,7 @@
 # Introduction to hnswlib
 
+English|[简体中文](./README.md)
+
 ## Latest Updates
 
 - [2026.03.30]: The reconstructed hnswlib version is released on the GitCode platform. It supports the FP 16 data type, NEON vectorization, prefetching, and database ID renumbering optimization. The reconstructed hnswlib simplifies the code structure and improves usability.
@@ -124,9 +126,5 @@ The documents of this project are licensed under CC-BY 4.0. For details, see [LI
 We welcome your contributions to the community. If you have any questions/suggestions or want to provide feedback on feature requirements and bug reports, you can submit [issues](https://gitcode.com/boostkit/community/blob/master/docs/contributor/issue-submit.md). For details, see [Contribution Guideline](https://gitcode.com/boostkit/community/blob/master/docs/contributor/contributing.md). You are also welcome to share insights in the [Discussions](https://gitcode.com/boostkit/community/discussions). Thank you for your support.
 
 ## Acknowledgments
-
-hnswlib is jointly developed by the following Huawei department:
-
-- Kunpeng Computing BoostKit Development Dept
 
 Thank you to everyone in the community for your PRs. We warmly welcome contributions to hnswlib!

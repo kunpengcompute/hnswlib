@@ -20,6 +20,11 @@
 <td class="cellrowborder" valign="top" width="57.830000000000005%" headers="mcps1.1.3.3.1 "><p id="p1730912179911"><a name="p1730912179911"></a><a name="p1730912179911"></a>hnswlib</p>
 </td>
 </tr>
+<tr id="row1930811171892"><th class="firstcol" valign="top" width="42.17%" id="mcps1.1.3.3.1"><p id="p2030912172097"><a name="p2030912172097"></a><a name="p2030912172097"></a>软件版本</p>
+</th>
+<td class="cellrowborder" valign="top" width="57.830000000000005%" headers="mcps1.1.3.3.1 "><p id="p1730912179911"><a name="p1730912179911"></a><a name="p1730912179911"></a>v1.1.0</p>
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -69,9 +74,9 @@
 
 ### 使用注意事项
 
-请参见[《hnswlib 安装指南》](./installation_guide.md)。
+使用注意事项请参见[《hnswlib 安装指南》](./installation_guide.md)。
 
-## V26.0.RC1
+## v1.1.0
 
 ### 更新说明
 
@@ -95,13 +100,13 @@ hnswlib重构版本发布于Gitcode平台，支持fp16数据类型，支持NEON�
 
 无
 
-## V25.3.0
+## v1.0.0
 
 ### 更新说明
 
 **新增特性<a name="section11862975"></a>**
 
-新增hnswlib子库，代码已开源发布至GitCode上，分支版本号为**v1.0.0**，需要通过源代码编译后使用，。
+新增hnswlib子库，代码已开源发布至GitCode上，分支版本号为**v1.0.0**，需要通过源代码编译后使用。
 
 **修改特性<a name="section16450949161512"></a>**
 
