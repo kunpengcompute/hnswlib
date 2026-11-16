@@ -1,5 +1,7 @@
 # API参考
 
+本文档介绍基于开源hnswlib新增的FP16数据类型的距离计算空间类L2SpacePh和IPSpacePh的API参考，适用于需要在ARM平台上加速FP16向量的距离计算的用户。
+
 ## 概述
 
 在开源hnswlib API的基础上，新增了FP16数据类型的距离计算空间类L2SpacePh和IPSpacePh，用于在ARM平台上加速FP16向量的距离计算。其余API与开源hnswlib API保持不变。FP32和FP16的距离计算实现差异体现在加载数据类型不同。FP32距离计算加载FP32类型数据，FP16距离计算加载FP16类型数据，但二者均返回FP32数据类型的计算结果。本文档作为hnswlib算法的API参考手册，详细介绍了各接口的功能和使用方法。
@@ -38,7 +40,7 @@
 </tbody>
 </table>
 
->![](public_sys-resources/icon-note.gif) **说明：** 
+>![note](public_sys-resources/icon-note.gif) **说明：**
 >除上述接口差异外，其余接口与开源代码接口的使用方式保持一致。
 
 **距离计算实现差异<a name="section1839510154"></a>**
@@ -62,7 +64,7 @@ space = std::make_unique<hnswlib::L2Space>(dim); // 构造方法二
 
 | 参数 | 参数说明 |
 | --- | --- |
-| `dim` | 向量维度。 |
+| dim | 向量维度。 |
 
 **说明**
 
@@ -82,7 +84,7 @@ space = std::make_unique<hnswlib::InnerProductSpace>(dim); // 构造方法二
 
 | 参数 | 参数说明 |
 | --- | --- |
-| `dim` | 向量维度。 |
+| dim | 向量维度。 |
 
 **说明**
 
@@ -106,7 +108,7 @@ space = std::make_unique<hnswlib::L2SpacePh>(dim); // 构造方法二
 
 | 参数 | 参数说明 |
 | --- | --- |
-| `dim` | 向量维度。 |
+| dim | 向量维度。 |
 
 **说明**
 
@@ -129,7 +131,7 @@ space = std::make_unique<hnswlib::IPSpacePh>(dim); // 构造方法二
 
 | 参数 | 参数说明 |
 | --- | --- |
-| `dim` | 向量维度。 |
+| dim | 向量维度。 |
 
 **说明**
 
@@ -178,9 +180,9 @@ void addPoint(const void* data_point, labeltype label, bool replace_deleted = fa
 
 | 参数 | 参数说明 |
 | --- | --- |
-| `data_point` | 指向数据点的指针（FP32或FP16类型，取决于使用的空间类）。 |
-| `label` | 数据点的标签。 |
-| `replace_deleted` | 是否允许替换已删除的元素（需要构造时设置`allow_replace_deleted=true`）。 |
+| data_point | 指向数据点的指针（FP32或FP16类型，取决于使用的空间类）。 |
+| label | 数据点的标签。 |
+| replace_deleted | 是否允许替换已删除的元素（需要构造时设置allow_replace_deleted=true）。 |
 
 #### searchKnn
 
@@ -226,7 +228,7 @@ void saveIndex(const std::string& location);
 
 | 参数 | 参数说明 |
 | --- | --- |
-| `location` | 保存文件的路径。 |
+| location | 保存文件的路径。 |
 
 #### loadIndex
 
@@ -240,9 +242,9 @@ void loadIndex(const std::string& location, SpaceInterface<float>* s, size_t max
 
 | 参数 | 参数说明 |
 | --- | --- |
-| `location` | 索引文件路径。 |
-| `s` | 空间对象。 |
-| `max_elements` | 可选的新最大元素数量。 |
+| location | 索引文件路径。 |
+| s | 空间对象。 |
+| max_elements | 可选的新最大元素数量。 |
 
 #### setEf
 
@@ -256,7 +258,7 @@ void setEf(size_t ef);
 
 | 参数 | 参数说明 |
 | --- | --- |
-| `ef` | 查询时的ef参数值（应大于搜索的k值）。 |
+| ef | 查询时的ef参数值（应大于搜索的k值）。 |
 
 #### markDelete
 
@@ -270,7 +272,7 @@ void markDelete(labeltype label);
 
 | 参数 | 参数说明 |
 | --- | --- |
-| `label` | 要删除的元素标签。 |
+| label | 要删除的元素标签。 |
 
 #### unmarkDelete
 
@@ -284,7 +286,7 @@ void unmarkDelete(labeltype label);
 
 | 参数 | 参数说明 |
 | --- | --- |
-| `label` | 要取消删除的元素标签。 |
+| label | 要取消删除的元素标签。 |
 
 #### resizeIndex
 
@@ -298,7 +300,7 @@ void resizeIndex(size_t new_max_elements);
 
 | 参数 | 参数说明 |
 | --- | --- |
-| `new_max_elements` | 新的最大元素数量（必须大于当前元素数量）。 |
+| new_max_elements | 新的最大元素数量（必须大于当前元素数量）。 |
 
 ## FP32与FP16接口比较
 
@@ -310,3 +312,9 @@ void resizeIndex(size_t new_max_elements);
 | 速度 | 快 | 更快（在支持NEON的ARM平台上） |
 | 空间类 | L2Space, InnerProductSpace | L2SpacePh, IPSpacePh |
 | 平台要求 | 无特殊要求 | 仅支持NEON架构 |
+
+## 修订记录
+
+|文档版本|发布日期|修改说明|
+|--|--|--|
+|01|2026-03-30|第一次正式发布。|

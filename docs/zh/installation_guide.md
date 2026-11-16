@@ -1,5 +1,7 @@
 # 安装指南
 
+本文档介绍安装步骤，涵盖环境验证、编译安装与兼容性测试，适用于需要安装hnswlib的用户。
+
 ## 已验证环境
 
 为保证您可以顺利安全地使用hnswlib，请确保所使用的环境信息在已验证环境范围内。
@@ -27,7 +29,7 @@
 </td>
 <td class="cellrowborder" valign="top" width="13.468653134686532%" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002483307829_p13225618153916"><a name="zh-cn_topic_0000002483307829_p13225618153916"></a><a name="zh-cn_topic_0000002483307829_p13225618153916"></a>GCC 12.3.1</p>
 </td>
-<td class="cellrowborder" valign="top" width="21.16788321167883%" headers="mcps1.2.8.1.7 "><p id="zh-cn_topic_0000002483307829_p1031335541614"><a name="zh-cn_topic_0000002483307829_p1031335541614"></a><a name="zh-cn_topic_0000002483307829_p1031335541614"></a>CMake&gt;=3.22.0</p>
+<td class="cellrowborder" valign="top" width="21.16788321167883%" headers="mcps1.2.8.1.7 "><p id="zh-cn_topic_0000002483307829_p1031335541614"><a name="zh-cn_topic_0000002483307829_p1031335541614"></a><a name="zh-cn_topic_0000002483307829_p1031335541614"></a>CMake 3.22.0及以上版本</p>
 </td>
 </tr>
 <tr id="zh-cn_topic_0000002483307829_row3961151410518"><td class="cellrowborder" valign="top" width="16.93830616938306%" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002483307829_p396116141055"><a name="zh-cn_topic_0000002483307829_p396116141055"></a><a name="zh-cn_topic_0000002483307829_p396116141055"></a>openEuler 24.03 LTS SP3</p>
@@ -38,7 +40,7 @@
 </td>
 <td class="cellrowborder" valign="top" width="13.468653134686532%" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002483307829_p996118141510"><a name="zh-cn_topic_0000002483307829_p996118141510"></a><a name="zh-cn_topic_0000002483307829_p996118141510"></a>GCC 12.3.1</p>
 </td>
-<td class="cellrowborder" valign="top" width="21.16788321167883%" headers="mcps1.2.8.1.7 "><p id="zh-cn_topic_0000002483307829_p139618141551"><a name="zh-cn_topic_0000002483307829_p139618141551"></a><a name="zh-cn_topic_0000002483307829_p139618141551"></a>CMake&gt;=3.22.0</p>
+<td class="cellrowborder" valign="top" width="21.16788321167883%" headers="mcps1.2.8.1.7 "><p id="zh-cn_topic_0000002483307829_p139618141551"><a name="zh-cn_topic_0000002483307829_p139618141551"></a><a name="zh-cn_topic_0000002483307829_p139618141551"></a>CMake 3.22.0及以上版本</p>
 </td>
 </tr>
 </tbody>
@@ -46,7 +48,7 @@
 
 ## 编译安装hnswlib
 
-先从GitHub下载hnswlib开源代码，然后从GitCode下载hnswlib补丁代码，应用补丁。安装依赖需要使用yum命令，需要将当前用户切换至“root”用户执行。
+先下载hnswlib开源代码，然后下载hnswlib补丁代码，应用补丁。安装依赖需要使用yum命令，需要将当前用户切换至“root”用户执行。
 
 1. 获取开源代码，假设安装路径为“/path/to”。
 
@@ -168,7 +170,7 @@ hnswlib是Hierarchical Navigable Small World（分层可导航小世界）图检
 
     脚本文件的内容如下所示。
 
-    ```bash
+    ```output
     rm -rf build
     mkdir build
     cd build
@@ -203,4 +205,10 @@ hnswlib是Hierarchical Navigable Small World（分层可导航小世界）图检
 
     测试结果如下图所示。
 
-    ![](figures/zh-cn_image_0000002549877895.png)
+    ![兼容性测试验证结果](figures/zh-cn_image_0000002549877895.png)
+
+## 修订记录
+
+|文档版本|发布日期|修改说明|
+|--|--|--|
+|01|2026-03-30|第一次正式发布。|

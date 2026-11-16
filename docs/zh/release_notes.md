@@ -1,5 +1,7 @@
 # 版本说明书
 
+本文档提供hnselib版本信息。
+
 ## 版本配套说明
 
 ### 产品版本信息
@@ -22,7 +24,7 @@
 </tr>
 <tr id="row1930811171892"><th class="firstcol" valign="top" width="42.17%" id="mcps1.1.3.3.1"><p id="p2030912172097"><a name="p2030912172097"></a><a name="p2030912172097"></a>软件版本</p>
 </th>
-<td class="cellrowborder" valign="top" width="57.830000000000005%" headers="mcps1.1.3.3.1 "><p id="p1730912179911"><a name="p1730912179911"></a><a name="p1730912179911"></a>v1.1.0</p>
+<td class="cellrowborder" valign="top" width="57.830000000000005%" headers="mcps1.1.3.3.1 "><p id="p1730912179911"><a name="p1730912179911"></a><a name="p1730912179911"></a>V1.1.0</p>
 </td>
 </tr>
 </tbody>
@@ -53,7 +55,7 @@
 </td>
 <td class="cellrowborder" valign="top" width="13.468653134686532%" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002483307829_p13225618153916"><a name="zh-cn_topic_0000002483307829_p13225618153916"></a><a name="zh-cn_topic_0000002483307829_p13225618153916"></a>GCC 12.3.1</p>
 </td>
-<td class="cellrowborder" valign="top" width="21.16788321167883%" headers="mcps1.2.8.1.7 "><p id="zh-cn_topic_0000002483307829_p1031335541614"><a name="zh-cn_topic_0000002483307829_p1031335541614"></a><a name="zh-cn_topic_0000002483307829_p1031335541614"></a>CMake&gt;=3.22.0</p>
+<td class="cellrowborder" valign="top" width="21.16788321167883%" headers="mcps1.2.8.1.7 "><p id="zh-cn_topic_0000002483307829_p1031335541614"><a name="zh-cn_topic_0000002483307829_p1031335541614"></a><a name="zh-cn_topic_0000002483307829_p1031335541614"></a>CMake 3.22.0及以上版本</p>
 </td>
 </tr>
 <tr id="zh-cn_topic_0000002483307829_row3961151410518"><td class="cellrowborder" valign="top" width="16.93830616938306%" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002483307829_p396116141055"><a name="zh-cn_topic_0000002483307829_p396116141055"></a><a name="zh-cn_topic_0000002483307829_p396116141055"></a>openEuler 24.03 LTS SP3</p>
@@ -64,7 +66,7 @@
 </td>
 <td class="cellrowborder" valign="top" width="13.468653134686532%" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002483307829_p996118141510"><a name="zh-cn_topic_0000002483307829_p996118141510"></a><a name="zh-cn_topic_0000002483307829_p996118141510"></a>GCC 12.3.1</p>
 </td>
-<td class="cellrowborder" valign="top" width="21.16788321167883%" headers="mcps1.2.8.1.7 "><p id="zh-cn_topic_0000002483307829_p139618141551"><a name="zh-cn_topic_0000002483307829_p139618141551"></a><a name="zh-cn_topic_0000002483307829_p139618141551"></a>CMake&gt;=3.22.0</p>
+<td class="cellrowborder" valign="top" width="21.16788321167883%" headers="mcps1.2.8.1.7 "><p id="zh-cn_topic_0000002483307829_p139618141551"><a name="zh-cn_topic_0000002483307829_p139618141551"></a><a name="zh-cn_topic_0000002483307829_p139618141551"></a>CMake 3.22.0及以上版本</p>
 </td>
 </tr>
 </tbody>
@@ -74,15 +76,15 @@
 
 ### 使用注意事项
 
-使用注意事项请参见[《hnswlib 安装指南》](./installation_guide.md)。
+使用注意事项请参见《[hnswlib 安装指南](./installation_guide.md)》。
 
-## v1.1.0
+## V1.1.0
 
 ### 更新说明
 
 **新增特性<a name="section11862975"></a>**
 
-hnswlib重构版本发布于Gitcode平台，支持fp16数据类型，支持NEON向量化、预取和底库ID重排优化，重构后的hnswlib精简了代码结构，提升了易用性，代码分支版本号为**v1.1.0**。
+hnswlib重构版本支持fp16数据类型，支持NEON向量化、预取和底库ID重排优化，重构后的hnswlib精简了代码结构，提升了易用性，代码分支版本号为**v1.1.0**。
 
 **修改特性<a name="section16450949161512"></a>**
 
@@ -100,13 +102,13 @@ hnswlib重构版本发布于Gitcode平台，支持fp16数据类型，支持NEON�
 
 无
 
-## v1.0.0
+## V1.0.0
 
 ### 更新说明
 
 **新增特性<a name="section11862975"></a>**
 
-新增hnswlib子库，代码已开源发布至GitCode上，分支版本号为**v1.0.0**，需要通过源代码编译后使用。
+新增hnswlib子库，分支版本号为**v1.0.0**，需要通过源代码编译后使用。
 
 **修改特性<a name="section16450949161512"></a>**
 
@@ -126,7 +128,7 @@ hnswlib重构版本发布于Gitcode平台，支持fp16数据类型，支持NEON�
 
 ## 版本配套文档
 
-### V26.0.RC1版本配套文档
+### V1.1.0版本配套文档
 
 <a name="table41916133"></a>
 <table><thead align="left"><tr id="row28804032"><th class="cellrowborder" valign="top" width="45.019999999999996%" id="mcps1.1.4.1.1"><p id="p4697041"><a name="p4697041"></a><a name="p4697041"></a>文档名称</p>

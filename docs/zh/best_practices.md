@@ -1,6 +1,6 @@
 # 最佳实践
 
-本节介绍在鲲鹏平台测试优化后的hnswlib的方法，依赖鲲鹏的优化补丁文件0001-hnswlib_0.8.0-optimize-fp32_fp16_dis_idsort_prefetch.patch。
+本文档介绍在鲲鹏平台测试优化后的hnswlib的方法，依赖鲲鹏的优化补丁文件0001-hnswlib_0.8.0-optimize-fp32_fp16_dis_idsort_prefetch.patch。
 
 ## 优化后的hnswlib测试示例
 
@@ -62,10 +62,10 @@
     
     ```
 
-    >![](public_sys-resources/icon-note.gif) **说明：** 
+    >![note](public_sys-resources/icon-note.gif) **说明：**
     >- 首次编译时，根据命令行提示交互输入hnswlib路径和需要开启的宏，脚本将在build文件夹下自动保存对应的配置信息。后续再次编译时可以直接修改build下的config_hnswlib.sh或config_hnswlib_fp16.sh文件中的配置，再次运行hnswlib_test或hnswlib_fp16_test即可。
-    >- 编译hnswlib_test需要开启宏：-DUSE_NEON
-    >- 编译hnswlib_fp16_test需要开启宏：-DUSE_NEON -DUSE_FP16
+    >- 编译hnswlib_test需要开启宏：-DUSE_NEON。
+    >- 编译hnswlib_fp16_test需要开启宏：-DUSE_NEON -DUSE_FP16。
 
 5. 运行测试脚本。
 
@@ -76,7 +76,7 @@
 
     测试结果存在output文件夹中，关注测试结果的QPS指标，并且召回率大于0.99。
 
-    >![](public_sys-resources/icon-note.gif) **说明：** 
+    >![note](public_sys-resources/icon-note.gif) **说明：** 
     >- "/configs"文件夹下包含了不同数据集的配置信息，其中，index\_path是索引保存路径，save\_or\_load是图索引构建或加载选项。
     >- 当save\_or\_load选项为save时表示构图模式，此时会将构建的图索引保存到"/index\_path"中。
     >- 当save\_or\_load选项为load时表示加载模式，此时会从"/index\_path"中加载图索引，直接用于后续的搜索。
@@ -86,9 +86,9 @@
 
 ## 性能优化建议
 
-1. **选择合适的数据类型**：在精度要求不高的场景下，优先使用FP16以减少内存占用和提升性能。
-2. **调整参数**：调整M、efc、efs参数，详见[性能测试参数调优指导](#性能测试参数调优指导)。
-3. **批处理查询**：尽量批量处理查询，减少线程创建开销。
+- **选择合适的数据类型**：在精度要求不高的场景下，优先使用FP16以减少内存占用和提升性能。
+- **调整参数**：调整M、efc、efs参数，详见[性能测试参数调优指导](#性能测试参数调优指导)。
+- **批处理查询**：尽量批量处理查询，减少线程创建开销。
 
 ## 性能测试参数调优指导
 
@@ -101,7 +101,7 @@
             └── hnswlib_fp16_fashion-mnist-784-euclidean.config
 ```
 
-config文件的内容如下所示：
+config文件的内容如下所示。
 
 ```text
 # HNSWLIB
@@ -155,7 +155,7 @@ index_path = indexes/hnswlib_fp16/fashion.hnswlib
 </tbody>
 </table>
 
->![](public_sys-resources/icon-note.gif) **说明：** 
+>![note](public_sys-resources/icon-note.gif) **说明：** 
 >在**save\_or\_load = save**模式下进行上述参数调优，构建索引时建议使用单NUMA，调优目标为保证召回率大于0.99的情况下，寻找QPS最高的参数组合。
 
 ## （可选）UT测试
@@ -169,7 +169,7 @@ index_path = indexes/hnswlib_fp16/fashion.hnswlib
     vim run.sh
     ```
 
-    run.sh脚本内容如下：
+    run.sh脚本内容如下。
 
     ```bash
     rm -rf build
@@ -188,3 +188,9 @@ index_path = indexes/hnswlib_fp16/fashion.hnswlib
     ```bash
     sh run.sh
     ```
+
+## 修订记录
+
+|文档版本|发布日期|修改说明|
+|--|--|--|
+|01|2026-03-30|第一次正式发布。|
