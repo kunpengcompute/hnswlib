@@ -170,7 +170,7 @@ hnswlib是Hierarchical Navigable Small World（分层可导航小世界）图检
 
     脚本文件的内容如下所示。
 
-    ```output
+    ```bash
     rm -rf build
     mkdir build
     cd build
