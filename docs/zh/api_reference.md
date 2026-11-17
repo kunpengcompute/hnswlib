@@ -1,10 +1,6 @@
 # API参考
 
-本文档介绍基于开源hnswlib新增的FP16数据类型的距离计算空间类L2SpacePh和IPSpacePh的API参考，适用于需要在ARM平台上加速FP16向量的距离计算的用户。
-
-## 概述
-
-在开源hnswlib API的基础上，新增了FP16数据类型的距离计算空间类L2SpacePh和IPSpacePh，用于在ARM平台上加速FP16向量的距离计算。其余API与开源hnswlib API保持不变。FP32和FP16的距离计算实现差异体现在加载数据类型不同。FP32距离计算加载FP32类型数据，FP16距离计算加载FP16类型数据，但二者均返回FP32数据类型的计算结果。本文档作为hnswlib算法的API参考手册，详细介绍了各接口的功能和使用方法。
+本文档介绍在开源hnswlib API的基础上，新增了FP16数据类型的距离计算空间类L2SpacePh和IPSpacePh，用于在ARM平台上加速FP16向量的距离计算。其余API与开源hnswlib API保持不变。FP32和FP16的距离计算实现差异体现在加载数据类型不同。FP32距离计算加载FP32类型数据，FP16距离计算加载FP16类型数据，但二者均返回FP32数据类型的计算结果。本文档作为hnswlib算法的API参考手册，详细介绍了各接口的功能和使用方法。
 
 ## 与开源代码的差异
 
@@ -14,31 +10,10 @@
 
 **表 1**  距离计算空间接口
 
-<a name="table04611241184112"></a>
-<table><thead align="left"><tr id="row1846114117417"><th class="cellrowborder" valign="top" width="11.93%" id="mcps1.2.5.1.1"><p id="p9872141016446"><a name="p9872141016446"></a><a name="p9872141016446"></a>距离类型</p>
-</th>
-<th class="cellrowborder" valign="top" width="11.51%" id="mcps1.2.5.1.2"><p id="p16461941194115"><a name="p16461941194115"></a><a name="p16461941194115"></a>数据类型</p>
-</th>
-<th class="cellrowborder" valign="top" width="31.540000000000003%" id="mcps1.2.5.1.4"><p id="p12461134164117"><a name="p12461134164117"></a><a name="p12461134164117"></a>接口名称</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row6461134117419"><td class="cellrowborder" valign="top" width="11.93%" headers="mcps1.2.5.1.1 "><p id="p9872510194410"><a name="p9872510194410"></a><a name="p9872510194410"></a>L2</p>
-</td>
-<td class="cellrowborder" valign="top" width="11.51%" headers="mcps1.2.5.1.2 "><p id="p1046114114411"><a name="p1046114114411"></a><a name="p1046114114411"></a>FP16</p>
-</td>
-<td class="cellrowborder" valign="top" width="31.540000000000003%" headers="mcps1.2.5.1.4 "><p id="p94547165121"><a name="p94547165121"></a><a name="p94547165121"></a>L2SpacePh</p>
-</td>
-</tr>
-<tr id="row423022213459"><td class="cellrowborder" valign="top" width="11.93%" headers="mcps1.2.5.1.1 "><p id="p04601651065"><a name="p04601651065"></a><a name="p04601651065"></a>IP</p>
-</td>
-<td class="cellrowborder" valign="top" width="11.51%" headers="mcps1.2.5.1.2 "><p id="p22301822204515"><a name="p22301822204515"></a><a name="p22301822204515"></a>FP16</p>
-</td>
-<td class="cellrowborder" valign="top" width="31.540000000000003%" headers="mcps1.2.5.1.4 "><p id="p764211191141"><a name="p764211191141"></a><a name="p764211191141"></a>IPSpacePh</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 距离类型 | 数据类型 | 接口名称 |
+| --- | --- | --- |
+| L2 | FP16 | L2SpacePh |
+| IP | FP16 | IPSpacePh |
 
 >![note](public_sys-resources/icon-note.gif) **说明：**
 >除上述接口差异外，其余接口与开源代码接口的使用方式保持一致。

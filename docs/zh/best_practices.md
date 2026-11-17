@@ -1,6 +1,6 @@
 # 最佳实践
 
-本文档介绍在鲲鹏平台测试优化后的hnswlib的方法，依赖鲲鹏的优化补丁文件0001-hnswlib_0.8.0-optimize-fp32_fp16_dis_idsort_prefetch.patch。
+本文档介绍在鲲鹏平台测试优化版hnswlib的方法，依赖鲲鹏的优化补丁文件0001-hnswlib_0.8.0-optimize-fp32_fp16_dis_idsort_prefetch.patch。
 
 ## 优化后的hnswlib测试示例
 
@@ -122,38 +122,11 @@ index_path = indexes/hnswlib_fp16/fashion.hnswlib
 
 **表 1** 调优参数表<a id="调优参数表"></a>
 
-<a name="table114596415225"></a>
-<table><thead align="left"><tr id="row4459164110224"><th class="cellrowborder" valign="top" width="12.38123812381238%" id="mcps1.2.4.1.1"><p id="p114598418224"><a name="p114598418224"></a><a name="p114598418224"></a>参数名称</p>
-</th>
-<th class="cellrowborder" valign="top" width="26.512651265126514%" id="mcps1.2.4.1.2"><p id="p44598418228"><a name="p44598418228"></a><a name="p44598418228"></a>参数含义</p>
-</th>
-<th class="cellrowborder" valign="top" width="61.106110611061105%" id="mcps1.2.4.1.3"><p id="p24598411224"><a name="p24598411224"></a><a name="p24598411224"></a>调优建议</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row1645974112221"><td class="cellrowborder" valign="top" width="12.38123812381238%" headers="mcps1.2.4.1.1 "><p id="p184591741102210"><a name="p184591741102210"></a><a name="p184591741102210"></a>k_f</p>
-</td>
-<td class="cellrowborder" valign="top" width="26.512651265126514%" headers="mcps1.2.4.1.2 "><p id="p124591241112214"><a name="p124591241112214"></a><a name="p124591241112214"></a>每个节点在HNSW图中的最大连接数。</p>
-</td>
-<td class="cellrowborder" valign="top" width="61.106110611061105%" headers="mcps1.2.4.1.3 "><p id="p3459341122210"><a name="p3459341122210"></a><a name="p3459341122210"></a>较小的值可以减少索引的大小，但可能会降低搜索精度；较大的值可以提高搜索精度，但会增加索引的大小和构建时间。</p>
-</td>
-</tr>
-<tr id="row1645912412221"><td class="cellrowborder" valign="top" width="12.38123812381238%" headers="mcps1.2.4.1.1 "><p id="p13459134182213"><a name="p13459134182213"></a><a name="p13459134182213"></a>efs</p>
-</td>
-<td class="cellrowborder" valign="top" width="26.512651265126514%" headers="mcps1.2.4.1.2 "><p id="p7459341192219"><a name="p7459341192219"></a><a name="p7459341192219"></a>在搜索时，每个节点的候选邻居数量。</p>
-</td>
-<td class="cellrowborder" valign="top" width="61.106110611061105%" headers="mcps1.2.4.1.3 "><p id="p15459941202217"><a name="p15459941202217"></a><a name="p15459941202217"></a>较小的值可以加快搜索速度，但可能会降低搜索精度；较大的值可以提高搜索精度，但会增加搜索时间。</p>
-</td>
-</tr>
-<tr id="row11459741202211"><td class="cellrowborder" valign="top" width="12.38123812381238%" headers="mcps1.2.4.1.1 "><p id="p154591441132214"><a name="p154591441132214"></a><a name="p154591441132214"></a>efc</p>
-</td>
-<td class="cellrowborder" valign="top" width="26.512651265126514%" headers="mcps1.2.4.1.2 "><p id="p114591741162217"><a name="p114591741162217"></a><a name="p114591741162217"></a>在构建索引时，每个节点的候选邻居数量。</p>
-</td>
-<td class="cellrowborder" valign="top" width="61.106110611061105%" headers="mcps1.2.4.1.3 "><p id="p245916419226"><a name="p245916419226"></a><a name="p245916419226"></a>较小的值可以加快索引构建速度，但可能会降低索引质量；较大的值可以提高索引的质量，但会增加索引构建时间。构建时使用较大值（如200-800）以获得更好的索引质量。</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数名称 | 参数含义 | 调优建议 |
+| --- | --- | --- |
+| k_f | 每个节点在HNSW图中的最大连接数。 | 较小的值可以减少索引的大小，但可能会降低搜索精度；较大的值可以提高搜索精度，但会增加索引的大小和构建时间。 |
+| efs | 在搜索时，每个节点的候选邻居数量。 | 较小的值可以加快搜索速度，但可能会降低搜索精度；较大的值可以提高搜索精度，但会增加搜索时间。 |
+| efc | 在构建索引时，每个节点的候选邻居数量。 | 较小的值可以加快索引构建速度，但可能会降低索引质量；较大的值可以提高索引的质量，但会增加索引构建时间。构建时使用较大值（如200-800）以获得更好的索引质量。 |
 
 >![note](public_sys-resources/icon-note.gif) **说明：** 
 >在**save\_or\_load = save**模式下进行上述参数调优，构建索引时建议使用单NUMA，调优目标为保证召回率大于0.99的情况下，寻找QPS最高的参数组合。
