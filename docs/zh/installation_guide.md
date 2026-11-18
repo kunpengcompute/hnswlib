@@ -1,52 +1,21 @@
 # 安装指南
 
+本文档介绍hnswlib安装步骤，涵盖环境验证、编译安装与兼容性测试，适用于需要安装hnswlib的用户。
+
 ## 已验证环境
 
 为保证您可以顺利安全地使用hnswlib，请确保所使用的环境信息在已验证环境范围内。
 
 **表 1** hnswlib已验证环境<a id="hnswlib已验证环境"></a>
 
-<a name="table59918346913"></a>
-<table><thead align="left"><tr id="zh-cn_topic_0000002483307829_row1169294312212"><th class="cellrowborder" valign="top" width="16.93830616938306%" id="mcps1.2.8.1.3"><p id="zh-cn_topic_0000002483307829_p12692144313211"><a name="zh-cn_topic_0000002483307829_p12692144313211"></a><a name="zh-cn_topic_0000002483307829_p12692144313211"></a>操作系统</p>
-</th>
-<th class="cellrowborder" valign="top" width="15.468453154684534%" id="mcps1.2.8.1.4"><p id="zh-cn_topic_0000002483307829_p06926438214"><a name="zh-cn_topic_0000002483307829_p06926438214"></a><a name="zh-cn_topic_0000002483307829_p06926438214"></a>CPU类型</p>
-</th>
-<th class="cellrowborder" valign="top" width="10.63893610638936%" id="mcps1.2.8.1.5"><p id="zh-cn_topic_0000002483307829_p269284310216"><a name="zh-cn_topic_0000002483307829_p269284310216"></a><a name="zh-cn_topic_0000002483307829_p269284310216"></a>内存</p>
-</th>
-<th class="cellrowborder" valign="top" width="13.468653134686532%" id="mcps1.2.8.1.6"><p id="zh-cn_topic_0000002483307829_p196922434215"><a name="zh-cn_topic_0000002483307829_p196922434215"></a><a name="zh-cn_topic_0000002483307829_p196922434215"></a>编译器</p>
-</th>
-<th class="cellrowborder" valign="top" width="21.16788321167883%" id="mcps1.2.8.1.7"><p id="zh-cn_topic_0000002483307829_p1769219435210"><a name="zh-cn_topic_0000002483307829_p1769219435210"></a><a name="zh-cn_topic_0000002483307829_p1769219435210"></a>其他</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="zh-cn_topic_0000002483307829_row1326345193910"><td class="cellrowborder" valign="top" width="16.93830616938306%" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002483307829_p2225161819395"><a name="zh-cn_topic_0000002483307829_p2225161819395"></a><a name="zh-cn_topic_0000002483307829_p2225161819395"></a>openEuler 22.03 LTS SP3</p>
-</td>
-<td class="cellrowborder" valign="top" width="15.468453154684534%" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002483307829_p1178432114216"><a name="zh-cn_topic_0000002483307829_p1178432114216"></a><a name="zh-cn_topic_0000002483307829_p1178432114216"></a>鲲鹏920 7282C处理器</p>
-</td>
-<td class="cellrowborder" valign="top" width="10.63893610638936%" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002483307829_p20325717499"><a name="zh-cn_topic_0000002483307829_p20325717499"></a><a name="zh-cn_topic_0000002483307829_p20325717499"></a>16 * 32GB</p>
-</td>
-<td class="cellrowborder" valign="top" width="13.468653134686532%" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002483307829_p13225618153916"><a name="zh-cn_topic_0000002483307829_p13225618153916"></a><a name="zh-cn_topic_0000002483307829_p13225618153916"></a>GCC 12.3.1</p>
-</td>
-<td class="cellrowborder" valign="top" width="21.16788321167883%" headers="mcps1.2.8.1.7 "><p id="zh-cn_topic_0000002483307829_p1031335541614"><a name="zh-cn_topic_0000002483307829_p1031335541614"></a><a name="zh-cn_topic_0000002483307829_p1031335541614"></a>CMake&gt;=3.22.0</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002483307829_row3961151410518"><td class="cellrowborder" valign="top" width="16.93830616938306%" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002483307829_p396116141055"><a name="zh-cn_topic_0000002483307829_p396116141055"></a><a name="zh-cn_topic_0000002483307829_p396116141055"></a>openEuler 24.03 LTS SP3</p>
-</td>
-<td class="cellrowborder" valign="top" width="15.468453154684534%" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002483307829_p1696113141356"><a name="zh-cn_topic_0000002483307829_p1696113141356"></a><a name="zh-cn_topic_0000002483307829_p1696113141356"></a>鲲鹏950 7592C处理器</p>
-</td>
-<td class="cellrowborder" valign="top" width="10.63893610638936%" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002483307829_p179617141654"><a name="zh-cn_topic_0000002483307829_p179617141654"></a><a name="zh-cn_topic_0000002483307829_p179617141654"></a>24 * 64GB</p>
-</td>
-<td class="cellrowborder" valign="top" width="13.468653134686532%" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002483307829_p996118141510"><a name="zh-cn_topic_0000002483307829_p996118141510"></a><a name="zh-cn_topic_0000002483307829_p996118141510"></a>GCC 12.3.1</p>
-</td>
-<td class="cellrowborder" valign="top" width="21.16788321167883%" headers="mcps1.2.8.1.7 "><p id="zh-cn_topic_0000002483307829_p139618141551"><a name="zh-cn_topic_0000002483307829_p139618141551"></a><a name="zh-cn_topic_0000002483307829_p139618141551"></a>CMake&gt;=3.22.0</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 操作系统 | CPU类型 | 内存 | 编译器 | 其他 |
+| --- | --- | --- | --- | --- |
+| openEuler 22.03 LTS SP3 | 鲲鹏920 7282C处理器 | 16 * 32GB | GCC 12.3.1 | CMake 3.22.0及以上版本 |
+| openEuler 24.03 LTS SP3 | 鲲鹏950 7592C处理器 | 24 * 64GB | GCC 12.3.1 | CMake 3.22.0及以上版本 |
 
 ## 编译安装hnswlib
 
-先从GitHub下载hnswlib开源代码，然后从GitCode下载hnswlib补丁代码，应用补丁。安装依赖需要使用yum命令，需要将当前用户切换至“root”用户执行。
+先下载hnswlib开源代码，然后下载hnswlib补丁代码，应用补丁。安装依赖需要使用yum命令，需要将当前用户切换至“root”用户执行。
 
 1. 获取开源代码，假设安装路径为“/path/to”。
 
@@ -203,4 +172,10 @@ hnswlib是Hierarchical Navigable Small World（分层可导航小世界）图检
 
     测试结果如下图所示。
 
-    ![](figures/zh-cn_image_0000002549877895.png)
+    ![兼容性测试验证结果](figures/zh-cn_image_0000002549877895.png)
+
+## 修订记录
+
+|文档版本|发布日期|修改说明|
+|--|--|--|
+|01|2026-03-30|第一次正式发布。|
